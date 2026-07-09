@@ -121,6 +121,79 @@ class NeuroSyncAuth {
         sessionStorage.removeItem(this.TOKEN_KEY);
         window.location.href = 'index.html';
     }
+
+    isBiometricSupported() {
+        return typeof window.PublicKeyCredential !== 'undefined';
+    }
+
+    async registerBiometrics(email = '') {
+        if (!this.isBiometricSupported()) {
+            throw new Error('El navegador no es compatible con reconocimiento biométrico WebAuthn.');
+        }
+
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const userId = new Uint8Array(16);
+        window.crypto.getRandomValues(userId);
+
+        const rpId = (window.location.hostname && window.location.hostname !== '') ? window.location.hostname : undefined;
+
+        const publicKey = {
+            challenge: challenge,
+            rp: { name: "NeuroSync Clinical App", ...(rpId ? { id: rpId } : {}) },
+            user: {
+                id: userId,
+                name: email || "usuario@neurosync.com",
+                displayName: (email || "Usuario NeuroSync").split('@')[0]
+            },
+            pubKeyCredParams: [
+                { type: "public-key", alg: -7 },
+                { type: "public-key", alg: -257 }
+            ],
+            authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required"
+            },
+            timeout: 60000
+        };
+
+        try {
+            const credential = await navigator.credentials.create({ publicKey });
+            if (credential) {
+                localStorage.setItem('neurosync_biometric_enabled', 'true');
+                if (email) localStorage.setItem('neurosync_biometric_email', email);
+                return { success: true };
+            }
+        } catch (err) {
+            throw new Error('Activación biométrica cancelada o no disponible en este contexto.');
+        }
+    }
+
+    async loginWithBiometrics() {
+        if (!this.isBiometricSupported()) {
+            throw new Error('Biometría no soportada en este dispositivo.');
+        }
+
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        const publicKey = {
+            challenge: challenge,
+            timeout: 60000,
+            userVerification: "required"
+        };
+
+        try {
+            const assertion = await navigator.credentials.get({ publicKey });
+            if (assertion) {
+                const savedEmail = localStorage.getItem('neurosync_biometric_email') || localStorage.getItem(this.STORAGE_KEY) || "miembro@neurosync.com";
+                this.saveSession(savedEmail, 'biometric-verified-token', true);
+                return { success: true, email: savedEmail };
+            }
+        } catch (err) {
+            throw new Error('No se pudo verificar la huella o Face ID.');
+        }
+    }
 }
 
 window.neuroAuth = new NeuroSyncAuth();

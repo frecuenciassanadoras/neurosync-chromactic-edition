@@ -161,6 +161,10 @@
                     <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 10px; padding: 15px;" id="submit-login-btn">
                         <i class="fas fa-bolt"></i> Validar & Ingresar al Panel
                     </button>
+
+                    <button type="button" id="biometric-login-btn" class="btn-pill btn-pill-glass" style="width: 100%; margin-top: 12px; padding: 14px; border-color: rgba(0,212,255,0.45); color: #00d4ff; display: none;" onclick="triggerBiometricAction()">
+                        <i class="fas fa-fingerprint" style="font-size: 1.25rem;"></i> <span id="bio-btn-label">Ingreso Biométrico (Huella / Face ID)</span>
+                    </button>
                 </form>
 
                 <div id="status-message" class="msg-banner"></div>
@@ -210,6 +214,68 @@
             passInput.setAttribute('type', isPass ? 'text' : 'password');
             toggleBtn.className = isPass ? 'fas fa-eye-slash input-icon-right' : 'fas fa-eye input-icon-right';
         });
+
+        // Setup Biometric UI
+        const bioBtn = document.getElementById('biometric-login-btn');
+        const bioLabel = document.getElementById('bio-btn-label');
+
+        function updateBiometricUI() {
+            if (window.neuroAuth && window.neuroAuth.isBiometricSupported()) {
+                bioBtn.style.display = 'flex';
+                bioBtn.style.alignItems = 'center';
+                bioBtn.style.justifyContent = 'center';
+                bioBtn.style.gap = '10px';
+
+                const isEnabled = localStorage.getItem('neurosync_biometric_enabled') === 'true';
+                if (isEnabled) {
+                    bioLabel.textContent = "Ingresar con Huella / Face ID";
+                } else {
+                    bioLabel.textContent = "Vincular Huella / Face ID";
+                }
+            }
+        }
+        updateBiometricUI();
+
+        async function triggerBiometricAction() {
+            msgBanner.style.display = 'none';
+            const isEnabled = localStorage.getItem('neurosync_biometric_enabled') === 'true';
+
+            if (isEnabled) {
+                try {
+                    bioBtn.disabled = true;
+                    const res = await window.neuroAuth.loginWithBiometrics();
+                    msgBanner.className = 'msg-banner success';
+                    msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> Identidad biométrica verificada. Bienvenido ${res.email}`;
+                    msgBanner.style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = 'sincronizador.html';
+                    }, 700);
+                } catch (err) {
+                    msgBanner.className = 'msg-banner error';
+                    msgBanner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${err.message}`;
+                    msgBanner.style.display = 'block';
+                } finally {
+                    bioBtn.disabled = false;
+                }
+            } else {
+                const emailVal = document.getElementById('user-email').value.trim() || 'usuario@neurosync.com';
+                try {
+                    bioBtn.disabled = true;
+                    await window.neuroAuth.registerBiometrics(emailVal);
+                    msgBanner.className = 'msg-banner success';
+                    msgBanner.innerHTML = `<i class="fas fa-fingerprint"></i> ¡Huella / Face ID vinculado correctamente en este dispositivo!`;
+                    msgBanner.style.display = 'block';
+                    updateBiometricUI();
+                } catch (err) {
+                    msgBanner.className = 'msg-banner error';
+                    msgBanner.innerHTML = `<i class="fas fa-info-circle"></i> ${err.message}`;
+                    msgBanner.style.display = 'block';
+                } finally {
+                    bioBtn.disabled = false;
+                }
+            }
+        }
 
         // Handle Login Submission with explicit validation
         const loginForm = document.getElementById('login-form');
