@@ -352,10 +352,52 @@
     <div id="screen-nature" class="view-screen">
         <div class="view-header-bar">
             <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()"><i class="fas fa-arrow-left"></i> Volver al Reproductor</button>
-            <h2 style="font-family: var(--font-heading);">Sonidos de la Naturaleza</h2>
+            <h2 style="font-family: var(--font-heading); background: linear-gradient(90deg, #10b981, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"><i class="fas fa-microchip"></i> MATRIZ CUÁNTICA DE NATURALEZA</h2>
         </div>
         <div class="view-screen-container">
-            <div id="nature-grid-modal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;"></div>
+            <!-- QUANTUM MIXER DECK -->
+            <div class="nature-deck-panel">
+                <div class="nature-deck-header">
+                    <div>
+                        <div class="nature-status-badge">
+                            <span class="nature-status-dot"></span>
+                            <span id="nature-active-counter">CANALES ACTIVOS: 0 / 15</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-volume-up" style="color: var(--chroma-green);"></i>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">VOL MAESTRO</span>
+                            <input type="range" min="0" max="1" step="0.01" value="0.7" class="cyber-slider" style="width: 110px;" oninput="onMasterNatureVolumeChange(this.value)">
+                        </div>
+                        <button class="btn-pill btn-pill-glass" style="border-color: rgba(239,68,68,0.4); color: #f87171;" onclick="stopAllNatureChannels()">
+                            <i class="fas fa-stop-circle"></i> Detener Todo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PRESETS INTELIGENTES -->
+                <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase;">
+                    <i class="fas fa-magic" style="color: var(--chroma-cyan);"></i> PRESETS BIO-ACÚSTICOS CUÁNTICOS
+                </div>
+                <div class="nature-presets-row">
+                    <button class="nature-preset-btn" onclick="applyNaturePreset('tormenta')">
+                        <i class="fas fa-cloud-showers-heavy" style="color: #38bdf8;"></i> Tormenta en el Bosque
+                    </button>
+                    <button class="nature-preset-btn" onclick="applyNaturePreset('costera')">
+                        <i class="fas fa-water" style="color: #06b6d4;"></i> Meditación Costera Delta
+                    </button>
+                    <button class="nature-preset-btn" onclick="applyNaturePreset('fogata')">
+                        <i class="fas fa-fire" style="color: #f97316;"></i> Fogata Estelar Nocturna
+                    </button>
+                    <button class="nature-preset-btn" onclick="applyNaturePreset('zen')">
+                        <i class="fas fa-dove" style="color: #10b981;"></i> Santuario Zen Fluvial
+                    </button>
+                </div>
+            </div>
+
+            <!-- CHANNEL GRID -->
+            <div id="nature-grid-modal" class="nature-channels-grid"></div>
         </div>
     </div>
 
@@ -861,12 +903,94 @@
 
         function renderNatureScreenGrid() {
             const grid = document.getElementById('nature-grid-modal');
-            grid.innerHTML = window.neuroAudio.natureSounds.map(track => `
-                <div class="freq-pill-item" onclick="window.neuroAudio.toggleNatureTrack('${track.id}')">
-                    <i class="${track.icon}" style="font-size: 1.4rem; margin-bottom: 8px; color: var(--chroma-green);"></i>
-                    <div style="font-size: 0.88rem; font-weight: 600;">${track.name}</div>
-                </div>
-            `).join('');
+            if (!grid) return;
+            grid.innerHTML = window.neuroAudio.natureSounds.map(track => {
+                const isActive = window.neuroAudio.isNatureTrackActive(track.id);
+                const currentVol = window.neuroAudio.getNatureTrackVolume(track.id);
+                return `
+                    <div class="nature-channel-card ${isActive ? 'active' : ''}" id="nat-card-${track.id}" onclick="toggleNatureChannelCard(event, '${track.id}')">
+                        <div class="nature-channel-header">
+                            <div class="nature-channel-icon-wrap">
+                                <i class="${track.icon}"></i>
+                            </div>
+                            <div class="nature-power-toggle"></div>
+                        </div>
+                        <div class="nature-channel-title">${track.name}</div>
+                        <div class="nature-volume-controls" onclick="event.stopPropagation()">
+                            <i class="fas fa-volume-down" style="font-size: 0.75rem; color: var(--text-muted);"></i>
+                            <input type="range" min="0" max="1" step="0.02" value="${currentVol}" class="cyber-slider" oninput="onNatureChannelVolumeChange('${track.id}', this.value)">
+                            <i class="fas fa-volume-up" style="font-size: 0.75rem; color: var(--chroma-green);"></i>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            updateNatureActiveCounter();
+        }
+
+        function toggleNatureChannelCard(event, id) {
+            window.neuroAudio.toggleNatureTrack(id);
+            const card = document.getElementById(`nat-card-${id}`);
+            if (card) {
+                card.classList.toggle('active', window.neuroAudio.isNatureTrackActive(id));
+            }
+            updateNatureActiveCounter();
+        }
+
+        function onNatureChannelVolumeChange(id, value) {
+            window.neuroAudio.setNatureVolume(id, value);
+        }
+
+        function onMasterNatureVolumeChange(value) {
+            window.neuroAudio.setMasterNatureVolume(value);
+            window.neuroAudio.natureSounds.forEach(track => {
+                if (window.neuroAudio.isNatureTrackActive(track.id)) {
+                    const card = document.getElementById(`nat-card-${track.id}`);
+                    if (card) {
+                        const slider = card.querySelector('input[type="range"]');
+                        if (slider) slider.value = value;
+                    }
+                }
+            });
+        }
+
+        function stopAllNatureChannels() {
+            window.neuroAudio.stopMasterNature();
+            renderNatureScreenGrid();
+        }
+
+        function applyNaturePreset(type) {
+            const presets = {
+                'tormenta': [
+                    { id: 'nat-3', vol: 0.7 },
+                    { id: 'nat-7', vol: 0.6 },
+                    { id: 'nat-5', vol: 0.5 }
+                ],
+                'costera': [
+                    { id: 'nat-9', vol: 0.65 },
+                    { id: 'nat-10', vol: 0.6 },
+                    { id: 'nat-8', vol: 0.4 }
+                ],
+                'fogata': [
+                    { id: 'nat-13', vol: 0.75 },
+                    { id: 'nat-14', vol: 0.5 },
+                    { id: 'nat-4', vol: 0.45 }
+                ],
+                'zen': [
+                    { id: 'nat-11', vol: 0.65 },
+                    { id: 'nat-12', vol: 0.5 },
+                    { id: 'nat-15', vol: 0.6 }
+                ]
+            };
+            const selected = presets[type] || [];
+            window.neuroAudio.activatePresetNature(selected);
+            renderNatureScreenGrid();
+        }
+
+        function updateNatureActiveCounter() {
+            const counter = document.getElementById('nature-active-counter');
+            if (!counter) return;
+            const activeCount = window.neuroAudio.natureSounds.filter(t => window.neuroAudio.isNatureTrackActive(t.id)).length;
+            counter.textContent = `CANALES ACTIVOS: ${activeCount} / ${window.neuroAudio.natureSounds.length}`;
         }
 
         function exportCustomWav() {

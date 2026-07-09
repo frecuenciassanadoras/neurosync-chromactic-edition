@@ -155,6 +155,19 @@ class NeuroAudioEngine {
         }
     }
 
+    isNatureTrackActive(id) {
+        return !!(this.natureAudioElements[id] && !this.natureAudioElements[id].paused);
+    }
+
+    getNatureTrackVolume(id) {
+        if (this.natureGainNodes[id]) {
+            return this.natureGainNodes[id].gain.value;
+        } else if (this.natureAudioElements[id]) {
+            return this.natureAudioElements[id].volume;
+        }
+        return 0.5;
+    }
+
     setNatureVolume(id, volume) {
         const vol = Math.max(0, Math.min(1, parseFloat(volume)));
         if (this.natureGainNodes[id]) {
@@ -162,6 +175,22 @@ class NeuroAudioEngine {
         } else if (this.natureAudioElements[id]) {
             this.natureAudioElements[id].volume = vol;
         }
+    }
+
+    setMasterNatureVolume(masterVol) {
+        const vol = Math.max(0, Math.min(1, parseFloat(masterVol)));
+        Object.keys(this.natureAudioElements).forEach(id => {
+            if (this.isNatureTrackActive(id)) {
+                this.setNatureVolume(id, vol);
+            }
+        });
+    }
+
+    activatePresetNature(idsWithVolumes) {
+        this.stopMasterNature();
+        idsWithVolumes.forEach(item => {
+            this.toggleNatureTrack(item.id, item.vol || 0.6);
+        });
     }
 
     playMasterNature() {

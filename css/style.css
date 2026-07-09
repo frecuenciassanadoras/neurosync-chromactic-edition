@@ -116,7 +116,9 @@ body {
     display: none;
     flex-direction: column;
     overflow-y: auto;
-    padding: 24px 20px 60px;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    padding: 24px 20px 140px;
     opacity: 0;
     transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -688,9 +690,225 @@ body {
         padding: 14px 16px;
     }
     .view-screen {
-        padding: 16px 12px 50px;
+        padding: 16px 12px 140px;
     }
     .stats-grid-3 {
         grid-template-columns: 1fr;
     }
+}
+
+/* ==========================================================================
+   QUANTUM BIO-ACOUSTIC NATURE MIXER (FUTURISTIC HIGH-TECH UI)
+   ========================================================================== */
+.nature-deck-panel {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.05) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.nature-deck-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--chroma-green), var(--chroma-cyan), transparent);
+}
+
+.nature-deck-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.nature-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: var(--chroma-green);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.nature-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--chroma-green);
+    box-shadow: 0 0 8px var(--chroma-green);
+    animation: naturePulse 2s infinite;
+}
+
+@keyframes naturePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.nature-presets-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.nature-preset-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 10px 16px;
+    color: var(--text-main);
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.nature-preset-btn:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--chroma-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+}
+
+.nature-channels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.nature-channel-card {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    cursor: pointer;
+}
+
+.nature-channel-card:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.nature-channel-card.active {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.16) 0%, rgba(15, 23, 42, 0.85) 100%);
+    border-color: var(--chroma-green);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.25), inset 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
+.nature-channel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.nature-channel-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--text-muted);
+    transition: all 0.3s;
+}
+
+.nature-channel-card.active .nature-channel-icon-wrap {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--chroma-green);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.nature-power-toggle {
+    width: 36px;
+    height: 20px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    transition: all 0.3s;
+}
+
+.nature-power-toggle::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nature-channel-card.active .nature-power-toggle {
+    background: var(--chroma-green);
+}
+
+.nature-channel-card.active .nature-power-toggle::after {
+    transform: translateX(16px);
+}
+
+.nature-channel-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.3px;
+}
+
+.nature-volume-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cyber-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.12);
+    outline: none;
+    cursor: pointer;
+}
+
+.cyber-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--chroma-green);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--chroma-green);
+    transition: transform 0.15s;
+}
+
+.cyber-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
 }
