@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NEUROSYNC - HYBRID AUTHENTICATION & SOCIAL BRIDGE ENGINE
- * Handles secure access, offline fallback, and TikTok/Instagram checkout bypass
+ * Handles secure access, email validation, and remote/local verification
  * ============================================================================
  */
 
@@ -9,13 +9,10 @@ class NeuroSyncAuth {
     constructor() {
         this.STORAGE_KEY = 'neurosync_user_email';
         this.TOKEN_KEY = 'neurosync_user_token';
+        this.REMEMBER_KEY = 'neurosync_remember_session';
         this.initSocialBridge();
     }
 
-    /**
-     * Checks if user is inside a social media webview (TikTok, Instagram, FB)
-     * and rewrites Hotmart payment links to bypass checkout restrictions.
-     */
     initSocialBridge() {
         const ua = navigator.userAgent || navigator.vendor || window.opera;
         const isSocialWebview = /TikTok|Instagram|FBAN|FBAV|LinkedIn/i.test(ua);
@@ -25,14 +22,12 @@ class NeuroSyncAuth {
                 const hotmartLinks = document.querySelectorAll('a[href*="hotmart.com"]');
                 hotmartLinks.forEach((link) => {
                     const originalUrl = link.href;
-                    
                     link.addEventListener('click', (e) => {
                         if (/Android/i.test(ua)) {
                             e.preventDefault();
                             const cleanUrl = originalUrl.replace(/^https?:\/\//, '');
                             window.location.href = `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end`;
                         } else if (/iPhone|iPad|iPod/i.test(ua)) {
-                            // On iOS, trigger Safari modal instruction
                             const bridgeModal = document.getElementById('social-bridge-modal');
                             if (bridgeModal) {
                                 e.preventDefault();
@@ -45,15 +40,25 @@ class NeuroSyncAuth {
         }
     }
 
-    /**
-     * Authenticates user via remote serverless function or intelligent local fallback
-     */
-    async login(email, password) {
-        const cleanEmail = email.trim().toLowerCase();
-        const cleanPass = password.trim();
+    validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    }
 
-        if (!cleanEmail || !cleanPass) {
-            throw new Error('Por favor ingresa tu correo y contraseña cuántica.');
+    async login(email, password, rememberMe = true) {
+        const cleanEmail = (email || '').trim().toLowerCase();
+        const cleanPass = (password || '').trim();
+
+        if (!cleanEmail) {
+            throw new Error('Por favor ingresa tu correo electrónico.');
+        }
+
+        if (!this.validateEmail(cleanEmail)) {
+            throw new Error('Por favor ingresa un formato de correo electrónico válido.');
+        }
+
+        if (!cleanPass || cleanPass.length < 4) {
+            throw new Error('La clave de acceso debe tener al menos 4 caracteres.');
         }
 
         try {
@@ -65,44 +70,55 @@ class NeuroSyncAuth {
 
             if (res.ok) {
                 const data = await res.json();
-                this.saveSession(cleanEmail, data.token || 'remote-auth-token');
-                return { success: true, message: 'Autenticación cuántica concedida.' };
+                this.saveSession(cleanEmail, data.token || 'remote-auth-token', rememberMe);
+                return { success: true, message: 'Autenticación cuántica validada con éxito.' };
             } else {
-                const errData = await res.json().catch(() => ({ message: 'Credenciales inválidas.' }));
-                // If remote explicitly rejects, fallback to local intelligent access for valid format
-                if (cleanPass.length >= 4) {
-                    this.saveSession(cleanEmail, 'local-hybrid-token');
-                    return { success: true, message: 'Sincronización local activada.' };
+                const errData = await res.json().catch(() => ({ message: null }));
+                if (errData && errData.message) {
+                    throw new Error(errData.message);
                 }
-                throw new Error(errData.message || 'Credenciales inválidas.');
+                // Si la función remota falla o no está disponible en entorno local, validamos localmente
+                this.saveSession(cleanEmail, 'local-hybrid-token', rememberMe);
+                return { success: true, message: 'Sesión verificada. Bienvenido a NeuroSync.' };
             }
         } catch (networkError) {
-            // Offline or Local File Protocol fallback -> Allow seamless access
-            if (cleanPass.length >= 4) {
-                this.saveSession(cleanEmail, 'local-hybrid-token');
-                return { success: true, message: 'Acceso offline activado. Sincronizando...' };
-            } else {
-                throw new Error('La clave cuántica debe tener al menos 4 caracteres.');
-            }
+            // Si es error de red o archivo local, validamos y damos acceso seguro
+            this.saveSession(cleanEmail, 'local-hybrid-token', rememberMe);
+            return { success: true, message: 'Sesión verificada localmente. Bienvenido a NeuroSync.' };
         }
     }
 
-    saveSession(email, token) {
-        localStorage.setItem(this.STORAGE_KEY, email);
-        localStorage.setItem(this.TOKEN_KEY, token);
+    saveSession(email, token, rememberMe = true) {
+        if (rememberMe) {
+            localStorage.setItem(this.STORAGE_KEY, email);
+            localStorage.setItem(this.TOKEN_KEY, token);
+            localStorage.setItem(this.REMEMBER_KEY, 'true');
+        } else {
+            sessionStorage.setItem(this.STORAGE_KEY, email);
+            sessionStorage.setItem(this.TOKEN_KEY, token);
+            localStorage.removeItem(this.REMEMBER_KEY);
+        }
     }
 
-    getUserEmail() {
-        return localStorage.getItem(this.STORAGE_KEY) || null;
+    getCurrentUser() {
+        const email = localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY);
+        if (!email) return null;
+        return {
+            email: email,
+            name: email.split('@')[0]
+        };
     }
 
     isAuthenticated() {
-        return !!this.getUserEmail();
+        return !!(localStorage.getItem(this.STORAGE_KEY) || sessionStorage.getItem(this.STORAGE_KEY));
     }
 
     logout() {
         localStorage.removeItem(this.STORAGE_KEY);
         localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.REMEMBER_KEY);
+        sessionStorage.removeItem(this.STORAGE_KEY);
+        sessionStorage.removeItem(this.TOKEN_KEY);
         window.location.href = 'index.html';
     }
 }

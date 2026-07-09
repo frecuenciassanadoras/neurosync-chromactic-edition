@@ -39,6 +39,12 @@
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-leaderboard');">
                 <i class="fas fa-trophy" style="color: var(--chroma-yellow);"></i> Top Global de Resonancia
             </div>
+            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-bluetooth');">
+                <i class="fas fa-broadcast-tower" style="color: #34d399;"></i> Conectar Bluetooth & Altavoces
+            </div>
+            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-share');">
+                <i class="fas fa-share-alt" style="color: var(--chroma-red);"></i> Compartir Estado en WhatsApp
+            </div>
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-binaural');">
                 <i class="fas fa-headphones" style="color: var(--chroma-cyan);"></i> Motor Binaural Dual
             </div>
@@ -51,9 +57,6 @@
             <a href="academia.html" class="sidebar-item">
                 <i class="fas fa-university" style="color: var(--chroma-orange);"></i> Universidad Cuántica
             </a>
-            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-social');">
-                <i class="fas fa-comment-dots" style="color: var(--chroma-red);"></i> Resonancia Global
-            </div>
             <div class="sidebar-item" onclick="toggleDrawer(); toggleMeditationLock();">
                 <i class="fas fa-moon" style="color: #94a3b8;"></i> Modo Meditación Profunda
             </div>
@@ -73,21 +76,21 @@
         <!-- HEADER NAVIGATION -->
         <header class="header-nav">
             <div>
-                <div class="status-pill" style="margin-bottom: 4px;">
-                    <span class="status-dot"></span> Sincronizado en Supabase
+                <div id="top-device-badge" class="status-pill" style="margin-bottom: 4px; cursor: pointer;" onclick="openScreen('screen-bluetooth')">
+                    <span class="status-dot"></span> Altavoz: Este Dispositivo
                 </div>
                 <div class="brand-title">Neuro<span>Sync</span></div>
             </div>
 
             <div class="nav-actions">
-                <button class="btn-icon" title="Reporte & Frecuencias Favoritas" onclick="openScreen('screen-reporte')">
-                    <i class="fas fa-chart-line" style="color: var(--chroma-cyan);"></i>
+                <button class="btn-icon" title="Conectar Dispositivo Bluetooth" onclick="openScreen('screen-bluetooth')">
+                    <i class="fas fa-broadcast-tower" style="color: #34d399;"></i>
+                </button>
+                <button class="btn-icon" title="Compartir Estado en WhatsApp" onclick="openScreen('screen-share')">
+                    <i class="fas fa-share-alt" style="color: var(--chroma-cyan);"></i>
                 </button>
                 <button class="btn-icon" title="Top Global de Resonancia" onclick="openScreen('screen-leaderboard')">
                     <i class="fas fa-trophy" style="color: var(--chroma-yellow);"></i>
-                </button>
-                <button class="btn-icon" title="Motor Binaural Dual" onclick="openScreen('screen-binaural')">
-                    <i class="fas fa-headphones" style="color: var(--chroma-violet);"></i>
                 </button>
                 <button class="btn-icon" title="Menú Principal" onclick="toggleDrawer()">
                     <i class="fas fa-bars"></i>
@@ -121,8 +124,12 @@
                     </div>
                 </div>
 
-                <!-- Media Controls -->
+                <!-- Media Controls (5 Buttons EXACTLY LIKE SPOTIFY: Shuffle, Prev, Play/Pause, Next, Loop) -->
                 <div class="player-controls">
+                    <button id="btn-shuffle" class="ctrl-btn-secondary" title="Modo Aleatorio" onclick="toggleShuffleMode()">
+                        <i class="fas fa-random"></i>
+                    </button>
+
                     <button class="ctrl-btn-secondary" title="Anterior" onclick="prevFrequencyTrack()">
                         <i class="fas fa-step-backward"></i>
                     </button>
@@ -134,17 +141,37 @@
                     <button class="ctrl-btn-secondary" title="Siguiente" onclick="nextFrequencyTrack()">
                         <i class="fas fa-step-forward"></i>
                     </button>
+
+                    <button id="btn-loop" class="ctrl-btn-secondary" title="Repetir Frecuencia en Bucle" onclick="toggleLoopMode()">
+                        <i class="fas fa-redo-alt"></i>
+                    </button>
+                </div>
+
+                <!-- Bottom Spotify Actions Row: Connect Bluetooth & Share Sheet -->
+                <div class="player-bottom-bar">
+                    <button id="btn-bt-bar" class="spotify-bottom-btn" title="Conectar a Dispositivos Bluetooth o Altavoces" onclick="openScreen('screen-bluetooth')">
+                        <i class="fas fa-broadcast-tower"></i> <span id="bt-status-label" style="font-size: 0.8rem;">Dispositivos</span>
+                    </button>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button class="spotify-bottom-btn" title="Compartir Frecuencia en WhatsApp" onclick="openScreen('screen-share')">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button class="spotify-bottom-btn" title="Lista de Frecuencias" onclick="openScreen('screen-reporte')">
+                            <i class="fas fa-stream"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Volume Slider -->
-                <div class="player-volume-row">
+                <div class="player-volume-row" style="margin-top: 14px;">
                     <i class="fas fa-volume-up" style="color: var(--text-muted); font-size: 0.95rem;"></i>
                     <input type="range" id="player-vol-slider" class="volume-slider" min="0" max="1" step="0.05" value="0.85" oninput="setBaseVolume(this.value)">
                 </div>
             </div>
 
             <!-- Frequencies Playlist Selector Grid -->
-            <div style="width: 100%; max-width: 960px; margin-top: 32px; padding: 0 12px;">
+            <div style="width: 100%; max-width: 960px; margin-top: 28px; padding: 0 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
                     <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">
                         Seleccionar Frecuencia Base (13 Frecuencias Sagradas)
@@ -159,7 +186,113 @@
     </div>
 
     <!-- ======================================================================
-         FULL SCREEN 1: REPORTE & FRECUENCIAS FAVORITAS
+         FULL SCREEN: CONECTAR A BLUETOOTH & ALTAVOCES
+         ====================================================================== -->
+    <div id="screen-bluetooth" class="view-screen">
+        <div class="view-header-bar">
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
+                <i class="fas fa-arrow-left"></i> Volver al Reproductor
+            </button>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
+                <i class="fas fa-broadcast-tower" style="color: #34d399;"></i> Conectar Dispositivo Bluetooth
+            </h2>
+        </div>
+
+        <div class="view-screen-container" style="max-width: 680px;">
+            <div class="glass-card" style="margin-bottom: 24px;">
+                <h3 style="font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 8px;">Conexión de Altavoces y Audífonos</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+                    Sincroniza tus frecuencias con altavoces de alta definición, audífonos binaurales o sistemas de sonido envolvente por Bluetooth.
+                </p>
+
+                <button class="btn-pill btn-pill-chroma" style="width: 100%; padding: 16px; font-size: 1.05rem; margin-bottom: 24px;" onclick="connectBluetoothDevice()">
+                    <i class="fab fa-bluetooth-b"></i> Emparejar Nuevo Dispositivo Bluetooth
+                </button>
+
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;">
+                    Dispositivos de Audio Disponibles
+                </div>
+
+                <div id="device-list-container" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="glass-card" style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-color: #10b981;">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <i class="fas fa-mobile-alt" style="font-size: 1.4rem; color: #10b981;"></i>
+                            <div>
+                                <div style="font-weight: 700; color: #fff;">Este Dispositivo (Audio Nativo)</div>
+                                <div style="font-size: 0.8rem; color: #34d399;">Salida activa actualmente</div>
+                            </div>
+                        </div>
+                        <span class="status-pill">ACTIVO</span>
+                    </div>
+
+                    <div class="glass-card" style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="connectBluetoothDevice()">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <i class="fas fa-headphones-alt" style="font-size: 1.4rem; color: var(--chroma-cyan);"></i>
+                            <div>
+                                <div style="font-weight: 700; color: #fff;">Audífonos / Altavoz Externo Bluetooth</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Emparejar por Web Bluetooth API</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         FULL SCREEN: COMPARTIR EN WHATSAPP (ESTADO O CHAT) & REDES
+         ====================================================================== -->
+    <div id="screen-share" class="view-screen">
+        <div class="view-header-bar">
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
+                <i class="fas fa-arrow-left"></i> Volver al Reproductor
+            </button>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
+                <i class="fas fa-share-alt" style="color: var(--chroma-cyan);"></i> Compartir Frecuencia (Estilo Spotify)
+            </h2>
+        </div>
+
+        <div class="view-screen-container" style="max-width: 650px;">
+            <!-- SPOTIFY VISUAL SHARE CARD PREVIEW -->
+            <div class="glass-card" style="background: linear-gradient(145deg, rgba(16,185,129,0.18), rgba(0,0,0,0.8)); border-color: rgba(16,185,129,0.35); padding: 32px; text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; color: #34d399; text-transform: uppercase; margin-bottom: 16px;">
+                    ESTADO DE RESONANCIA NEUROSYNC
+                </div>
+
+                <div style="width: 130px; height: 130px; border-radius: 24px; background: #000; border: 2px solid rgba(255,255,255,0.25); margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 15px 35px rgba(0,0,0,0.8);">
+                    <div id="share-card-hz" style="font-family: var(--font-heading); font-size: 2.3rem; font-weight: 800; color: #fff;">
+                        111<span style="font-size: 1.1rem;">Hz</span>
+                    </div>
+                </div>
+
+                <h3 id="share-card-title" style="font-family: var(--font-heading); font-size: 1.6rem; color: #fff; margin-bottom: 6px;">
+                    111 Hz - Regeneración celular
+                </h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 420px; margin: 0 auto;">
+                    "Sintonizando mi campo electromagnético y celular en alta resonancia con NeuroSync."
+                </p>
+            </div>
+
+            <!-- SHARE ACTION BUTTONS -->
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <button class="btn-pill btn-pill-whatsapp" style="width: 100%; padding: 18px; font-size: 1.08rem;" onclick="shareToWhatsAppStatus()">
+                    <i class="fab fa-whatsapp" style="font-size: 1.4rem;"></i> Compartir en WhatsApp (Estado o Chat)
+                </button>
+
+                <button class="btn-pill btn-pill-chroma" style="width: 100%; padding: 16px; font-size: 1rem;" onclick="shareViaWebShare()">
+                    <i class="fas fa-share-square"></i> Compartir con Otras Aplicaciones (Instagram, Telegram)
+                </button>
+
+                <button class="btn-pill btn-pill-glass" style="width: 100%; padding: 16px; font-size: 0.95rem;" onclick="copyFrequencyShareLink()">
+                    <i class="fas fa-copy"></i> Copiar Mensaje & Enlace de Resonancia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         FULL SCREEN: REPORTE & FRECUENCIAS FAVORITAS
          ====================================================================== -->
     <div id="screen-reporte" class="view-screen">
         <div class="view-header-bar">
@@ -172,7 +305,6 @@
         </div>
 
         <div class="view-screen-container">
-            <!-- WEEKLY SUMMARY CARDS -->
             <div class="stats-grid-3">
                 <div class="glass-card" style="text-align: center;">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Tiempo Total Escuchado</div>
@@ -190,7 +322,6 @@
                 </div>
             </div>
 
-            <!-- FAVORITE FREQUENCIES BREAKDOWN LIST -->
             <div style="margin-bottom: 16px; font-weight: 700; font-size: 0.88rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">
                 Desglose Completo por Frecuencia Escuchada
             </div>
@@ -199,7 +330,7 @@
     </div>
 
     <!-- ======================================================================
-         FULL SCREEN 2: TOP GLOBAL DE RESONANCIA (SUPABASE)
+         FULL SCREEN: TOP GLOBAL DE RESONANCIA (SUPABASE)
          ====================================================================== -->
     <div id="screen-leaderboard" class="view-screen">
         <div class="view-header-bar">
@@ -228,131 +359,41 @@
         </div>
     </div>
 
-    <!-- ======================================================================
-         FULL SCREEN 3: MOTOR BINAURAL DUAL
-         ====================================================================== -->
+    <!-- OTHER ENGINES SCREENS (BINAURAL, NATURE, GENERATOR) -->
     <div id="screen-binaural" class="view-screen">
         <div class="view-header-bar">
-            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
-                <i class="fas fa-arrow-left"></i> Volver al Reproductor
-            </button>
-            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
-                <i class="fas fa-headphones" style="color: var(--chroma-cyan);"></i> Motor Binaural Dual
-            </h2>
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()"><i class="fas fa-arrow-left"></i> Volver al Reproductor</button>
+            <h2 style="font-family: var(--font-heading);">Motor Binaural Dual</h2>
         </div>
-
         <div class="view-screen-container">
             <div class="glass-card">
-                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 28px;">
-                    Genera ondas cerebrales personalizadas (Delta, Theta, Alfa, Beta, Gamma) enviando frecuencias exactas con diferencia milimétrica entre tu oído izquierdo y derecho mediante Web Audio API.
-                </p>
-
-                <div class="stats-grid-3">
-                    <div>
-                        <label class="input-label">Oído Izquierdo (Frecuencia Portadora)</label>
-                        <select id="left-channel-select" class="form-input" onchange="updateBinauralFrequencies()">
-                            <option value="200">200 Hz - Base</option>
-                            <option value="174">174 Hz - Alivio</option>
-                            <option value="432">432 Hz - Resonancia</option>
-                            <option value="528">528 Hz - Reparación</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="input-label">Oído Derecho (Frecuencia Binaural)</label>
-                        <select id="right-channel-select" class="form-input" onchange="updateBinauralFrequencies()">
-                            <option value="208">208 Hz (8 Hz Alfa - Calma Relajante)</option>
-                            <option value="204">204 Hz (4 Hz Theta - Meditación Profunda)</option>
-                            <option value="202">202 Hz (2 Hz Delta - Sueño Reparador)</option>
-                            <option value="240">240 Hz (40 Hz Gamma - Máxima Concentración)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button class="btn-pill btn-pill-chroma" style="width: 100%; padding: 18px; font-size: 1.1rem; margin-top: 10px;" id="binaural-toggle-btn" onclick="toggleBinauralEngine()">
-                    <i class="fas fa-play"></i> Activar Motor Binaural
-                </button>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Genera ondas Delta, Theta, Alfa y Gamma con separación estéreo.</p>
+                <button class="btn-pill btn-pill-chroma" style="width: 100%;" id="binaural-toggle-btn" onclick="toggleBinauralEngine()"><i class="fas fa-play"></i> Activar Motor Binaural</button>
             </div>
         </div>
     </div>
 
-    <!-- ======================================================================
-         FULL SCREEN 4: MEZCLADOR DE SONIDOS DE LA NATURALEZA
-         ====================================================================== -->
     <div id="screen-nature" class="view-screen">
         <div class="view-header-bar">
-            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
-                <i class="fas fa-arrow-left"></i> Volver al Reproductor
-            </button>
-            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
-                <i class="fas fa-leaf" style="color: var(--chroma-green);"></i> Sonidos de la Naturaleza
-            </h2>
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()"><i class="fas fa-arrow-left"></i> Volver al Reproductor</button>
+            <h2 style="font-family: var(--font-heading);">Sonidos de la Naturaleza</h2>
         </div>
-
         <div class="view-screen-container">
-            <div id="nature-grid-modal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-bottom: 28px;"></div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 18px 24px; border-radius: 16px; flex-wrap: wrap; gap: 14px;">
-                <button class="btn-pill btn-pill-glass" style="color: #f87171;" onclick="window.neuroAudio.stopMasterNature()">
-                    <i class="fas fa-stop"></i> Detener Todos los Sonidos
-                </button>
-                <button class="btn-pill btn-pill-glass" onclick="addSleepTimer(15)">
-                    <i class="fas fa-clock"></i> Temporizador: +15 Min Sueño
-                </button>
-            </div>
+            <div id="nature-grid-modal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px;"></div>
         </div>
     </div>
 
-    <!-- ======================================================================
-         FULL SCREEN 5: GENERADOR Y EXPORTADOR WAV
-         ====================================================================== -->
     <div id="screen-generator" class="view-screen">
         <div class="view-header-bar">
-            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
-                <i class="fas fa-arrow-left"></i> Volver al Reproductor
-            </button>
-            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
-                <i class="fas fa-wave-square" style="color: var(--chroma-violet);"></i> Generador & Exporter WAV
-            </h2>
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()"><i class="fas fa-arrow-left"></i> Volver al Reproductor</button>
+            <h2 style="font-family: var(--font-heading);">Generador & Exporter WAV</h2>
         </div>
-
         <div class="view-screen-container">
-            <div class="glass-card" style="max-width: 650px; margin: 0 auto;">
-                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
-                    Sintetiza tonos puros a cualquier frecuencia exacta y descarga el archivo de audio `.WAV` sin compresión ni pérdida de calidad.
-                </p>
-
-                <div style="margin-bottom: 24px;">
-                    <label class="input-label">Frecuencia Exacta Deseada (Hz)</label>
-                    <input type="number" id="gen-freq-input" class="form-input" value="432" min="1" max="10000" style="font-size: 1.2rem;">
-                </div>
-
-                <button class="btn-pill btn-pill-chroma" style="width: 100%; padding: 18px; font-size: 1.05rem;" onclick="exportCustomWav()">
-                    <i class="fas fa-file-audio"></i> Descargar Archivo .WAV (5s PCM Puro)
-                </button>
+            <div class="glass-card" style="max-width: 500px; margin: 0 auto;">
+                <label class="input-label">Frecuencia Deseada (Hz)</label>
+                <input type="number" id="gen-freq-input" class="form-input" value="432" style="margin-bottom: 16px;">
+                <button class="btn-pill btn-pill-chroma" style="width: 100%;" onclick="exportCustomWav()"><i class="fas fa-file-audio"></i> Descargar WAV PCM</button>
             </div>
-        </div>
-    </div>
-
-    <!-- ======================================================================
-         FULL SCREEN 6: MURO GLOBAL DE RESONANCIA
-         ====================================================================== -->
-    <div id="screen-social" class="view-screen">
-        <div class="view-header-bar">
-            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
-                <i class="fas fa-arrow-left"></i> Volver al Reproductor
-            </button>
-            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
-                <i class="fas fa-comment-dots" style="color: var(--chroma-red);"></i> Muro Global de Resonancia
-            </h2>
-        </div>
-
-        <div class="view-screen-container">
-            <div style="margin-bottom: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
-                <input type="text" id="post-text-input" class="form-input" style="flex: 1; min-width: 220px;" placeholder="Comparte tu experiencia frecuencial con la comunidad...">
-                <button class="btn-pill btn-pill-chroma" onclick="createSocialPost()">Emitir Mensaje</button>
-            </div>
-            <div id="social-feed"></div>
         </div>
     </div>
 
@@ -369,12 +410,10 @@
         }
 
         /* ====================================================================
-           FULL-SCREEN VIEW SWITCHING SYSTEM (REPLACING MODAL POPUPS)
+           FULL-SCREEN VIEW SWITCHING SYSTEM
            ==================================================================== */
         function openScreen(screenId) {
-            // Hide all screens
             document.querySelectorAll('.view-screen').forEach(scr => scr.classList.remove('active'));
-            // Activate targeted full screen view
             const target = document.getElementById(screenId);
             if (target) target.classList.add('active');
             window.scrollTo(0, 0);
@@ -382,7 +421,7 @@
             if (screenId === 'screen-reporte') renderReporteScreen();
             if (screenId === 'screen-leaderboard') fetchSupabaseLeaderboard();
             if (screenId === 'screen-nature') renderNatureScreenGrid();
-            if (screenId === 'screen-social') populateSocialFeed();
+            if (screenId === 'screen-share') updateShareCardUI();
         }
 
         function showMainPlayerView() {
@@ -416,9 +455,95 @@
         ];
 
         let currentTrackIdx = 0;
+        let isShuffle = false;
         let baseAudio = new Audio();
         baseAudio.crossOrigin = "anonymous";
         let listeningTrackerTimer = null;
+
+        /* ====================================================================
+           1. LOOP / REPEAT & SHUFFLE SYSTEM (SPOTIFY STYLE)
+           ==================================================================== */
+        function toggleLoopMode() {
+            baseAudio.loop = !baseAudio.loop;
+            const btn = document.getElementById('btn-loop');
+            if (baseAudio.loop) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        function toggleShuffleMode() {
+            isShuffle = !isShuffle;
+            const btn = document.getElementById('btn-shuffle');
+            if (isShuffle) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        /* ====================================================================
+           2. BLUETOOTH & EXTERNAL SPEAKER ENGINE (SPOTIFY DEVICE PICKER)
+           ==================================================================== */
+        async function connectBluetoothDevice() {
+            if (navigator.bluetooth) {
+                try {
+                    const device = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: ['battery_service', 'audio_stream']
+                    });
+                    document.getElementById('bt-status-label').innerText = device.name || 'Bluetooth Conectado';
+                    document.getElementById('top-device-badge').innerHTML = `<span class="status-dot"></span> Altavoz: ${device.name}`;
+                    alert(`¡Dispositivo "${device.name}" sincronizado correctamente!`);
+                } catch (e) {
+                    // Si el usuario cancela o el navegador no tiene bluetooth activo
+                    alert('Puedes seleccionar tu altavoz o audífonos Bluetooth en el control de sonido de tu teléfono/PC.');
+                }
+            } else {
+                alert('Abre el menú Bluetooth de tu dispositivo para transmitir la resonancia a altavoces externos.');
+            }
+        }
+
+        /* ====================================================================
+           3. SPOTIFY-STYLE SHARE SHEET & WHATSAPP STATUS GENERATOR
+           ==================================================================== */
+        function updateShareCardUI() {
+            const track = frequencies[currentTrackIdx];
+            document.getElementById('share-card-hz').innerHTML = `${track.hz}<span style="font-size:1.1rem;">Hz</span>`;
+            document.getElementById('share-card-title').innerText = `${track.hz} Hz - ${track.name}`;
+        }
+
+        function getFormattedShareText() {
+            const track = frequencies[currentTrackIdx];
+            return `✨ Sintonizando la frecuencia sagrada ${track.hz} Hz (${track.name}) en NeuroSync. ¡Eleva tu vibración y resonancia mental! 🎧 Sintoniza aquí: ${window.location.origin || 'https://enter.converge.ai'}`;
+        }
+
+        function shareToWhatsAppStatus() {
+            const text = encodeURIComponent(getFormattedShareText());
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${text}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        async function shareViaWebShare() {
+            const track = frequencies[currentTrackIdx];
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: `NeuroSync - ${track.hz} Hz`,
+                        text: getFormattedShareText(),
+                        url: window.location.href
+                    });
+                } catch (e) {}
+            } else {
+                copyFrequencyShareLink();
+            }
+        }
+
+        function copyFrequencyShareLink() {
+            navigator.clipboard.writeText(getFormattedShareText());
+            alert('¡Mensaje y enlace de frecuencia copiado al portapapeles! Listo para pegar en tu Estado de WhatsApp o Instagram.');
+        }
 
         /* ====================================================================
            LISTENING TRACKER & FAVORITE FREQUENCY REPORT SYSTEM
@@ -677,8 +802,13 @@
         }
 
         function nextFrequencyTrack() {
-            const newIdx = (currentTrackIdx + 1) % frequencies.length;
-            selectFrequencyTrack(newIdx);
+            if (isShuffle) {
+                const randIdx = Math.floor(Math.random() * frequencies.length);
+                selectFrequencyTrack(randIdx);
+            } else {
+                const newIdx = (currentTrackIdx + 1) % frequencies.length;
+                selectFrequencyTrack(newIdx);
+            }
         }
 
         function setBaseVolume(val) {
@@ -725,29 +855,13 @@
             nextFrequencyTrack();
         });
 
-        /* ====================================================================
-           MODALS / DRAWERS MANAGEMENT
-           ==================================================================== */
         function toggleDrawer() {
             document.getElementById('sidebar-drawer').classList.toggle('open');
         }
 
-        function toggleBinauralEngine() {
-            const leftHz = parseFloat(document.getElementById('left-channel-select').value) || 200;
-            const rightHz = parseFloat(document.getElementById('right-channel-select').value) || 208;
-
-            window.neuroAudio.toggleBinaural(leftHz, rightHz, (isPlaying) => {
-                const btn = document.getElementById('binaural-toggle-btn');
-                btn.innerHTML = isPlaying 
-                    ? '<i class="fas fa-pause"></i> Detener Motor Binaural'
-                    : '<i class="fas fa-play"></i> Activar Motor Binaural';
-            });
-        }
-
-        function updateBinauralFrequencies() {
-            const leftHz = parseFloat(document.getElementById('left-channel-select').value) || 200;
-            const rightHz = parseFloat(document.getElementById('right-channel-select').value) || 208;
-            window.neuroAudio.updateBinauralFrequencies(leftHz, rightHz);
+        function toggleMeditationLock() {
+            const lock = document.getElementById('meditation-lock');
+            lock.classList.toggle('active');
         }
 
         function renderNatureScreenGrid() {
@@ -763,36 +877,6 @@
         function exportCustomWav() {
             const freq = document.getElementById('gen-freq-input').value;
             window.neuroAudio.exportToneWav(freq, 'sine', 5, 0.5);
-        }
-
-        function toggleMeditationLock() {
-            const lock = document.getElementById('meditation-lock');
-            if (lock.classList.contains('active')) {
-                lock.classList.remove('active');
-            } else {
-                lock.classList.add('active');
-            }
-        }
-
-        function populateSocialFeed() {
-            const feed = document.getElementById('social-feed');
-            const stored = JSON.parse(localStorage.getItem('neurosync_posts') || '[]');
-            feed.innerHTML = stored.map(p => `
-                <div style="padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 12px;">
-                    <div style="font-weight: 700; color: var(--chroma-cyan); font-size: 0.95rem; margin-bottom: 4px;">${p.author}</div>
-                    <div style="font-size: 1.02rem; color: #fff;">${p.text}</div>
-                </div>
-            `).join('');
-        }
-
-        function createSocialPost() {
-            const input = document.getElementById('post-text-input');
-            if (!input.value.trim()) return;
-            const stored = JSON.parse(localStorage.getItem('neurosync_posts') || '[]');
-            stored.unshift({ author: 'Tú', text: input.value.trim() });
-            localStorage.setItem('neurosync_posts', JSON.stringify(stored));
-            input.value = '';
-            populateSocialFeed();
         }
 
         // Init player & tracking

@@ -29,7 +29,7 @@
 
         .login-hero-header h1 {
             font-family: var(--font-heading);
-            font-size: 2.8rem;
+            font-size: clamp(2.2rem, 6vw, 3rem);
             font-weight: 800;
             letter-spacing: -1px;
             margin-bottom: 8px;
@@ -46,6 +46,33 @@
         .login-card-container {
             width: 100%;
             max-width: 440px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-icon-left {
+            position: absolute;
+            left: 16px;
+            top: 42px;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .input-icon-right {
+            position: absolute;
+            right: 16px;
+            top: 42px;
+            color: var(--text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .form-input-with-icon {
+            padding-left: 44px !important;
+            padding-right: 44px !important;
         }
 
         .divider-box {
@@ -78,9 +105,9 @@
 
         .msg-banner {
             margin-top: 18px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.88rem;
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-size: 0.9rem;
             font-weight: 500;
             display: none;
             text-align: center;
@@ -88,13 +115,13 @@
 
         .msg-banner.success {
             background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.35);
+            border: 1px solid rgba(16, 185, 129, 0.4);
             color: #34d399;
         }
 
         .msg-banner.error {
             background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.35);
+            border: 1px solid rgba(239, 68, 68, 0.4);
             color: #f87171;
         }
     </style>
@@ -109,7 +136,7 @@
         <div class="login-hero-header">
             <div class="status-pill" style="margin-bottom: 16px;">
                 <span class="status-dot"></span>
-                Protocolo Cuántico V2 Activo
+                Acceso Sincronizado Seguro
             </div>
             <h1>Neuro<span>Sync</span></h1>
             <p>Sincronización Cerebral & Bienestar Frecuencial</p>
@@ -121,18 +148,18 @@
                     <div class="input-wrapper">
                         <label class="input-label">Correo Electrónico</label>
                         <i class="fas fa-envelope input-icon-left"></i>
-                        <input type="email" id="user-email" class="form-input" placeholder="correo@ejemplo.com" required autocomplete="email">
+                        <input type="email" id="user-email" class="form-input form-input-with-icon" placeholder="correo@ejemplo.com" required autocomplete="email">
                     </div>
 
                     <div class="input-wrapper">
                         <label class="input-label">Clave de Acceso</label>
                         <i class="fas fa-lock input-icon-left"></i>
-                        <input type="password" id="user-pass" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+                        <input type="password" id="user-pass" class="form-input form-input-with-icon" placeholder="••••••••" required autocomplete="current-password">
                         <i class="fas fa-eye input-icon-right" id="toggle-pass-visibility" title="Mostrar/Ocultar contraseña"></i>
                     </div>
 
-                    <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 8px;" id="submit-login-btn">
-                        <i class="fas fa-bolt"></i> Ingresar al Panel Cuántico
+                    <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 10px; padding: 15px;" id="submit-login-btn">
+                        <i class="fas fa-bolt"></i> Validar & Ingresar al Panel
                     </button>
                 </form>
 
@@ -143,12 +170,12 @@
                 </div>
 
                 <div class="actions-stack">
-                    <a href="https://pay.hotmart.com/U104728533E" target="_blank" rel="noopener" class="btn-pill btn-pill-hotmart" style="width: 100%;">
+                    <a href="https://pay.hotmart.com/U104728533E" target="_blank" rel="noopener" class="btn-pill btn-pill-primary" style="width: 100%;">
                         <i class="fas fa-ticket-alt"></i> Adquirir Frecuencias NeuroSync
                     </a>
 
-                    <a href="https://wa.link/3yc8pr" target="_blank" rel="noopener" class="btn-pill btn-pill-whatsapp" style="width: 100%;">
-                        <i class="fab fa-whatsapp" style="font-size: 1.15rem;"></i> Soporte Técnico por WhatsApp
+                    <a href="https://wa.link/3yc8pr" target="_blank" rel="noopener" class="btn-pill btn-pill-glass" style="width: 100%;">
+                        <i class="fab fa-whatsapp" style="font-size: 1.15rem; color: #22c55e;"></i> Soporte Técnico por WhatsApp
                     </a>
                 </div>
             </div>
@@ -175,11 +202,6 @@
         // Init Chromatic Flowing Engine
         const chromaEngine = new ChromaticFlowEngine('chromatic-canvas');
 
-        // Check if already authenticated
-        if (window.neuroAuth && window.neuroAuth.isAuthenticated()) {
-            window.location.href = 'sincronizador.html';
-        }
-
         // Toggle password visibility
         const toggleBtn = document.getElementById('toggle-pass-visibility');
         const passInput = document.getElementById('user-pass');
@@ -189,7 +211,7 @@
             toggleBtn.className = isPass ? 'fas fa-eye-slash input-icon-right' : 'fas fa-eye input-icon-right';
         });
 
-        // Handle Login Submission
+        // Handle Login Submission with explicit validation
         const loginForm = document.getElementById('login-form');
         const msgBanner = document.getElementById('status-message');
         const submitBtn = document.getElementById('submit-login-btn');
@@ -211,7 +233,7 @@
 
                 setTimeout(() => {
                     window.location.href = 'sincronizador.html';
-                }, 900);
+                }, 800);
             } catch (err) {
                 msgBanner.className = 'msg-banner error';
                 msgBanner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${err.message}`;
