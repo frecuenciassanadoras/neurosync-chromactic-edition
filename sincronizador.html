@@ -45,6 +45,9 @@
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-nature');">
                 <i class="fas fa-leaf" style="color: var(--chroma-green);"></i> Sonidos de la Naturaleza
             </div>
+            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-healing');">
+                <i class="fas fa-spa" style="color: #00d4ff;"></i> Frecuencias Sanadoras
+            </div>
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-generator');">
                 <i class="fas fa-wave-square" style="color: var(--chroma-violet);"></i> Generador & Exporter WAV
             </div>
@@ -410,8 +413,54 @@
             <div class="glass-card" style="max-width: 500px; margin: 0 auto;">
                 <label class="input-label">Frecuencia Deseada (Hz)</label>
                 <input type="number" id="gen-freq-input" class="form-input" value="432" style="margin-bottom: 16px;">
-                <button class="btn-pill btn-pill-chroma" style="width: 100%;" onclick="exportCustomWav()"><i class="fas fa-file-audio"></i> Descargar WAV PCM</button>
             </div>
+        </div>
+    </div>
+
+    <!-- FRECUENCIAS SANADORAS / MEDITACIONES GUIADAS (FONDO BUDA) -->
+    <div id="screen-healing" class="view-screen healing-buddha-screen">
+        <div class="view-header-bar">
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()"><i class="fas fa-arrow-left"></i> Volver al Reproductor</button>
+            <h2 style="font-family: var(--font-heading); background: linear-gradient(90deg, #00d4ff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"><i class="fas fa-spa"></i> Frecuencias Sanadoras y Meditación</h2>
+        </div>
+        <div class="view-screen-container">
+            <!-- Reproductor Cuántico de Meditación -->
+            <div id="healing-player-deck" class="glass-card" style="margin-bottom: 24px; padding: 24px; background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(0, 212, 255, 0.35); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(0, 212, 255, 0.15); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-spa" style="color: #00d4ff; font-size: 1.3rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.72rem; color: #00d4ff; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">REPRODUCIENDO FRECUENCIA SANADORA</div>
+                            <div id="healing-current-title" style="font-size: 1.15rem; font-weight: 700; color: #fff;">Selecciona un audio para iniciar</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fas fa-volume-up" style="color: #00d4ff;"></i>
+                        <input type="range" id="healing-vol-slider" min="0" max="1" step="0.02" value="0.85" class="cyber-slider" style="width: 100px;" oninput="onHealingVolumeChange(this.value)">
+                    </div>
+                </div>
+
+                <!-- Barra de Progreso -->
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+                    <span id="healing-time-current" style="color: var(--text-muted); font-size: 0.85rem; width: 45px; text-align: right; font-family: monospace;">0:00</span>
+                    <input type="range" id="healing-progress-slider" min="0" max="100" value="0" step="0.1" class="cyber-slider" style="flex: 1;" oninput="onHealingSeek(this.value)">
+                    <span id="healing-time-total" style="color: var(--text-muted); font-size: 0.85rem; width: 45px; font-family: monospace;">0:00</span>
+                </div>
+
+                <!-- Controles de Reproducción -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
+                    <button class="btn-pill btn-pill-glass" style="width: 46px; height: 46px; padding: 0; border-radius: 50%;" onclick="prevHealingTrack()"><i class="fas fa-step-backward"></i></button>
+                    <button id="healing-play-btn" onclick="toggleHealingPlay()" style="background: linear-gradient(135deg, #00d4ff, #a855f7); border: none; width: 64px; height: 64px; border-radius: 50%; color: #fff; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 25px rgba(0,212,255,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+                        <i class="fas fa-play" id="healing-play-icon" style="margin-left: 3px;"></i>
+                    </button>
+                    <button class="btn-pill btn-pill-glass" style="width: 46px; height: 46px; padding: 0; border-radius: 50%;" onclick="nextHealingTrack()"><i class="fas fa-step-forward"></i></button>
+                </div>
+            </div>
+
+            <!-- Lista de 10 Audios de Meditación -->
+            <div id="healing-grid-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;"></div>
         </div>
     </div>
 
@@ -439,6 +488,7 @@
             if (screenId === 'screen-reporte') renderReporteScreen();
             if (screenId === 'screen-leaderboard') fetchSupabaseLeaderboard();
             if (screenId === 'screen-nature') renderNatureScreenGrid();
+            if (screenId === 'screen-healing') renderHealingScreenGrid();
             if (screenId === 'screen-share') updateShareCardUI();
         }
 
@@ -996,6 +1046,151 @@
         function exportCustomWav() {
             const freq = document.getElementById('gen-freq-input').value;
             window.neuroAudio.exportToneWav(freq, 'sine', 5, 0.5);
+        }
+
+        /* ====================================================================
+           FRECUENCIAS SANADORAS Y MEDITACIONES GUIADAS (BUDDHA ENGINE)
+           ==================================================================== */
+        const healingMeditationAudios = [
+            { id: 0, name: "Flute Meditation", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Flute+Meditation.mp3", icon: "fas fa-spa" },
+            { id: 1, name: "Meditation Background", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Meditation+Background.mp3", icon: "fas fa-om" },
+            { id: 2, name: "Meditation Inmersive", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Meditation+Inmersive.mp3", icon: "fas fa-water" },
+            { id: 3, name: "Meditative Morning", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Meditative+Morning.mp3", icon: "fas fa-sun" },
+            { id: 4, name: "Twin Meditation", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Twin+Meditation.mp3", icon: "fas fa-infinity" },
+            { id: 5, name: "Autumn Sky Meditation", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Autumn+Sky+Meditation.mp3", icon: "fas fa-leaf" },
+            { id: 6, name: "Angelic Meditation", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Angelic+Meditation.mp3", icon: "fas fa-feather-alt" },
+            { id: 7, name: "Meditation Yoga Relaxing Music", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Meditation+Yoga+Relaxing+Music.mp3", icon: "fas fa-yin-yang" },
+            { id: 8, name: "Yoga Relax Meditation Music", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Yoga+Relax+Meditation+Music.mp3", icon: "fas fa-praying-hands" },
+            { id: 9, name: "Spiritual Meditation", url: "https://f005.backblazeb2.com/file/mis-frecuencias-musicales/MEDITACION/Spiritual+Meditation.mp3", icon: "fas fa-star" }
+        ];
+
+        let currentHealingIdx = -1;
+        const healingAudioPlayer = new Audio();
+        healingAudioPlayer.crossOrigin = "anonymous";
+
+        healingAudioPlayer.addEventListener('timeupdate', () => {
+            const cur = healingAudioPlayer.currentTime || 0;
+            const dur = healingAudioPlayer.duration || 0;
+            const slider = document.getElementById('healing-progress-slider');
+            const curLabel = document.getElementById('healing-time-current');
+            const durLabel = document.getElementById('healing-time-total');
+            if (dur > 0 && slider) {
+                slider.value = (cur / dur) * 100;
+                durLabel.textContent = formatTimeCustom(dur);
+            }
+            if (curLabel) curLabel.textContent = formatTimeCustom(cur);
+        });
+
+        healingAudioPlayer.addEventListener('ended', () => {
+            nextHealingTrack();
+        });
+
+        function formatTimeCustom(sec) {
+            if (isNaN(sec) || sec <= 0) return "0:00";
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function renderHealingScreenGrid() {
+            const grid = document.getElementById('healing-grid-list');
+            if (!grid) return;
+            grid.innerHTML = healingMeditationAudios.map((track, idx) => {
+                const isActive = (currentHealingIdx === idx && !healingAudioPlayer.paused);
+                const isSelected = (currentHealingIdx === idx);
+                return `
+                    <div class="healing-track-card ${isSelected ? 'active' : ''}" onclick="selectHealingTrack(${idx})">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(0, 212, 255, 0.12); display: flex; align-items: center; justify-content: center;">
+                                <i class="${track.icon}" style="color: #00d4ff; font-size: 1.25rem;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; color: #00d4ff; font-weight: 700;">#${(idx + 1) < 10 ? '0' + (idx + 1) : idx + 1}</div>
+                                <div style="font-size: 0.96rem; font-weight: 700; color: #fff;">${track.name}</div>
+                            </div>
+                        </div>
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: ${isActive ? '#00d4ff' : 'rgba(255,255,255,0.08)'}; display: flex; align-items: center; justify-content: center; color: ${isActive ? '#000' : '#fff'}; transition: all 0.2s;">
+                            <i class="fas ${isActive ? 'fa-pause' : 'fa-play'}" style="margin-left: ${isActive ? '0' : '2px'};"></i>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectHealingTrack(idx) {
+            if (currentHealingIdx === idx) {
+                toggleHealingPlay();
+                return;
+            }
+            currentHealingIdx = idx;
+            const track = healingMeditationAudios[idx];
+            healingAudioPlayer.src = track.url;
+            if (typeof baseAudio !== 'undefined' && !baseAudio.paused) {
+                baseAudio.pause();
+                const playIcon = document.getElementById('play-icon');
+                if (playIcon) playIcon.className = 'fas fa-play';
+            }
+            healingAudioPlayer.play().then(() => {
+                updateHealingPlayerUI();
+            }).catch(() => {});
+            updateHealingPlayerUI();
+        }
+
+        function toggleHealingPlay() {
+            if (currentHealingIdx === -1) {
+                selectHealingTrack(0);
+                return;
+            }
+            if (healingAudioPlayer.paused) {
+                if (typeof baseAudio !== 'undefined' && !baseAudio.paused) {
+                    baseAudio.pause();
+                    const playIcon = document.getElementById('play-icon');
+                    if (playIcon) playIcon.className = 'fas fa-play';
+                }
+                healingAudioPlayer.play().catch(() => {});
+            } else {
+                healingAudioPlayer.pause();
+            }
+            updateHealingPlayerUI();
+        }
+
+        function updateHealingPlayerUI() {
+            const title = document.getElementById('healing-current-title');
+            const playIcon = document.getElementById('healing-play-icon');
+            if (currentHealingIdx >= 0 && title) {
+                title.textContent = healingMeditationAudios[currentHealingIdx].name;
+            }
+            if (playIcon) {
+                if (!healingAudioPlayer.paused) {
+                    playIcon.className = "fas fa-pause";
+                    playIcon.style.marginLeft = "0";
+                } else {
+                    playIcon.className = "fas fa-play";
+                    playIcon.style.marginLeft = "3px";
+                }
+            }
+            renderHealingScreenGrid();
+        }
+
+        function prevHealingTrack() {
+            if (currentHealingIdx <= 0) selectHealingTrack(healingMeditationAudios.length - 1);
+            else selectHealingTrack(currentHealingIdx - 1);
+        }
+
+        function nextHealingTrack() {
+            if (currentHealingIdx >= healingMeditationAudios.length - 1) selectHealingTrack(0);
+            else selectHealingTrack(currentHealingIdx + 1);
+        }
+
+        function onHealingSeek(val) {
+            const dur = healingAudioPlayer.duration;
+            if (dur > 0) {
+                healingAudioPlayer.currentTime = (val / 100) * dur;
+            }
+        }
+
+        function onHealingVolumeChange(val) {
+            healingAudioPlayer.volume = Math.max(0, Math.min(1, parseFloat(val)));
         }
 
         // Init player & tracking

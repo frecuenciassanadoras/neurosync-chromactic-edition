@@ -912,3 +912,54 @@ body {
 .cyber-slider::-webkit-slider-thumb:hover {
     transform: scale(1.25);
 }
+
+/* ==========================================================================
+   FRECUENCIAS SANADORAS Y MEDITACIÓN (BUDDHA BACKGROUND SCREEN)
+   ========================================================================== */
+.healing-buddha-screen {
+    background: url('https://f005.backblazeb2.com/file/BACKUP-DE-IMAGENES/ESPIRITUALIDAD/NEUROSYNC2.0/VIDEO/IMAGENES/Dise%C3%B1o+sin+t%C3%ADtulo+(41).png') center/cover no-repeat !important;
+}
+
+.healing-buddha-screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 7, 18, 0.76);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 0;
+}
+
+.healing-buddha-screen .view-header-bar,
+.healing-buddha-screen .view-screen-container {
+    position: relative;
+    z-index: 1;
+}
+
+.healing-track-card {
+    background: rgba(15, 23, 42, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.healing-track-card:hover {
+    border-color: rgba(0, 212, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.healing-track-card.active {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.18) 0%, rgba(168, 85, 247, 0.15) 100%);
+    border-color: #00d4ff;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.3);
+}
