@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Clínico - NeuroSync</title>
+    
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .login-page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-hero-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-hero-header h1 {
+            font-family: var(--font-heading);
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+
+        .login-hero-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .login-card-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .divider-box {
+            display: flex;
+            align-items: center;
+            margin: 28px 0 20px;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .divider-box::before,
+        .divider-box::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .divider-box span {
+            padding: 0 14px;
+        }
+
+        .actions-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .msg-banner {
+            margin-top: 18px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+        }
+
+        .msg-banner.success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #34d399;
+        }
+
+        .msg-banner.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CHROMATIC FLOWING DISTORTION BACKGROUND -->
+    <canvas id="chromatic-canvas"></canvas>
+    <div class="film-grain"></div>
+
+    <div class="login-page-wrapper">
+        <div class="login-hero-header">
+            <div class="status-pill" style="margin-bottom: 16px;">
+                <span class="status-dot"></span>
+                Protocolo Cuántico V2 Activo
+            </div>
+            <h1>Neuro<span>Sync</span></h1>
+            <p>Sincronización Cerebral & Bienestar Frecuencial</p>
+        </div>
+
+        <div class="login-card-container">
+            <div class="glass-card">
+                <form id="login-form">
+                    <div class="input-wrapper">
+                        <label class="input-label">Correo Electrónico</label>
+                        <i class="fas fa-envelope input-icon-left"></i>
+                        <input type="email" id="user-email" class="form-input" placeholder="correo@ejemplo.com" required autocomplete="email">
+                    </div>
+
+                    <div class="input-wrapper">
+                        <label class="input-label">Clave de Acceso</label>
+                        <i class="fas fa-lock input-icon-left"></i>
+                        <input type="password" id="user-pass" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+                        <i class="fas fa-eye input-icon-right" id="toggle-pass-visibility" title="Mostrar/Ocultar contraseña"></i>
+                    </div>
+
+                    <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 8px;" id="submit-login-btn">
+                        <i class="fas fa-bolt"></i> Ingresar al Panel Cuántico
+                    </button>
+                </form>
+
+                <div id="status-message" class="msg-banner"></div>
+
+                <div class="divider-box">
+                    <span>¿Aún no tienes licencia?</span>
+                </div>
+
+                <div class="actions-stack">
+                    <a href="https://pay.hotmart.com/U104728533E" target="_blank" rel="noopener" class="btn-pill btn-pill-hotmart" style="width: 100%;">
+                        <i class="fas fa-ticket-alt"></i> Adquirir Frecuencias NeuroSync
+                    </a>
+
+                    <a href="https://wa.link/3yc8pr" target="_blank" rel="noopener" class="btn-pill btn-pill-whatsapp" style="width: 100%;">
+                        <i class="fab fa-whatsapp" style="font-size: 1.15rem;"></i> Soporte Técnico por WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOCIAL MEDIA IN-APP BROWSER BYPASS MODAL -->
+    <div id="social-bridge-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 420px; text-align: center;">
+            <i class="fas fa-external-link-alt" style="font-size: 3rem; color: var(--chroma-cyan); margin-bottom: 20px;"></i>
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px;">Paso Recomendado</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+                Para completar la adquisición o pago de forma 100% segura, abre esta página en tu navegador nativo (Safari o Chrome).
+            </p>
+            <button class="btn-pill btn-pill-primary" style="width: 100%;" onclick="document.getElementById('social-bridge-modal').classList.remove('active')">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script src="js/chromatic-bg.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Init Chromatic Flowing Engine
+        const chromaEngine = new ChromaticFlowEngine('chromatic-canvas');
+
+        // Check if already authenticated
+        if (window.neuroAuth && window.neuroAuth.isAuthenticated()) {
+            window.location.href = 'sincronizador.html';
+        }
+
+        // Toggle password visibility
+        const toggleBtn = document.getElementById('toggle-pass-visibility');
+        const passInput = document.getElementById('user-pass');
+        toggleBtn.addEventListener('click', () => {
+            const isPass = passInput.getAttribute('type') === 'password';
+            passInput.setAttribute('type', isPass ? 'text' : 'password');
+            toggleBtn.className = isPass ? 'fas fa-eye-slash input-icon-right' : 'fas fa-eye input-icon-right';
+        });
+
+        // Handle Login Submission
+        const loginForm = document.getElementById('login-form');
+        const msgBanner = document.getElementById('status-message');
+        const submitBtn = document.getElementById('submit-login-btn');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('user-email').value;
+            const pass = document.getElementById('user-pass').value;
+
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.75';
+            msgBanner.style.display = 'none';
+
+            try {
+                const res = await window.neuroAuth.login(email, pass);
+                msgBanner.className = 'msg-banner success';
+                msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> ${res.message}`;
+                msgBanner.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'sincronizador.html';
+                }, 900);
+            } catch (err) {
+                msgBanner.className = 'msg-banner error';
+                msgBanner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${err.message}`;
+                msgBanner.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>

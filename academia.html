@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universidad Cuántica - NeuroSync</title>
+    
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .academia-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .module-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .module-card:hover {
+            border-color: var(--glass-border-light);
+            transform: translateY(-2px);
+        }
+
+        .module-num {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--chroma-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .module-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--chroma-cyan), var(--chroma-violet));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="chromatic-canvas"></canvas>
+    <div class="film-grain"></div>
+
+    <header class="header-nav">
+        <div>
+            <div class="status-pill" style="margin-bottom: 6px;">
+                <span class="status-dot"></span> Módulo Evolutivo
+            </div>
+            <div class="brand-title">Neuro<span>Sync</span> Academia</div>
+        </div>
+
+        <a href="sincronizador.html" class="btn-pill btn-pill-glass">
+            <i class="fas fa-arrow-left"></i> Volver al Sincronizador
+        </a>
+    </header>
+
+    <div class="academia-wrapper">
+        <div class="glass-card">
+            <h2 style="font-family: var(--font-heading); font-size: 1.6rem; margin-bottom: 8px;">Progreso General de Maestría</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Completa cada uno de los 10 módulos cuánticos para desbloquear el grado de Maestro Sincronizador.</p>
+            
+            <div class="progress-bar-container">
+                <div id="mastery-bar-fill" class="progress-bar-fill"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted);">
+                <span>Progreso Completado</span>
+                <span id="mastery-pct">0%</span>
+            </div>
+        </div>
+
+        <div id="modules-list" class="modules-grid"></div>
+    </div>
+
+    <script src="js/chromatic-bg.js"></script>
+    <script>
+        const chromaEngine = new ChromaticFlowEngine('chromatic-canvas');
+
+        const modules = [
+            { id: 'm1', num: 'Módulo 01', title: 'Fundamentos de Ondas y Frecuencias Binaurales', desc: 'Comprende la física de la sincronización de hemisferios cerebrales.' },
+            { id: 'm2', num: 'Módulo 02', title: 'Resonancia Schumann (7.83 Hz)', desc: 'Conexión biológica con el latido electromagnético planetario.' },
+            { id: 'm3', num: 'Módulo 03', title: 'Ondas Theta y Meditación Profunda (4 Hz)', desc: 'Accediendo al subconsciente y reprogramación neuronal.' },
+            { id: 'm4', num: 'Módulo 04', title: 'Frecuencia Solfeggio 528 Hz', desc: 'Reparación armónica y bienestar molecular integral.' },
+            { id: 'm5', num: 'Módulo 05', title: 'Ondas Gamma (40 Hz) y Superenfoque', desc: 'Sincronía cognitiva de alta intensidad y retención mnémica.' },
+            { id: 'm6', num: 'Módulo 06', title: 'Higiene del Sueño y Frecuencias Delta (2 Hz)', desc: 'Arquitectura cuántica para el descanso restaurador.' },
+            { id: 'm7', num: 'Módulo 07', title: 'Mezcla Acústica e Integración de la Naturaleza', desc: 'Cómo equilibrar ruido rosa ambiental y tonos puros.' },
+            { id: 'm8', num: 'Módulo 08', title: 'Psicología Frecuencial y Liberación de Estrés', desc: 'Disminución del cortisol mediante patrones auditivos.' },
+            { id: 'm9', num: 'Módulo 09', title: 'Creación de Sesiones Personalizadas (.WAV)', desc: 'Síntesis y diseño de archivos acústicos sin compresión.' },
+            { id: 'm10', num: 'Módulo 10', title: 'Integración Diaria de NeuroSync', desc: 'Creando una rutina cuántica sostenible de por vida.' }
+        ];
+
+        function renderModules() {
+            const list = document.getElementById('modules-list');
+            const progress = JSON.parse(localStorage.getItem('neurosync_academia_progress') || '{}');
+
+            list.innerHTML = modules.map(m => {
+                const isCompleted = !!progress[m.id];
+                return `
+                    <div class="module-card">
+                        <span class="module-num">${m.num}</span>
+                        <div class="module-title">${m.title}</div>
+                        <p style="color: var(--text-muted); font-size: 0.88rem; flex: 1;">${m.desc}</p>
+                        
+                        <button class="btn-pill ${isCompleted ? 'btn-pill-primary' : 'btn-pill-glass'}" style="width: 100%;" onclick="toggleModule('${m.id}')">
+                            <i class="fas ${isCompleted ? 'fa-check-circle' : 'fa-play'}"></i>
+                            ${isCompleted ? 'Completado' : 'Iniciar Estudio'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            updateMasteryBar();
+        }
+
+        function toggleModule(id) {
+            const progress = JSON.parse(localStorage.getItem('neurosync_academia_progress') || '{}');
+            progress[id] = !progress[id];
+            localStorage.setItem('neurosync_academia_progress', JSON.stringify(progress));
+            renderModules();
+        }
+
+        function updateMasteryBar() {
+            const progress = JSON.parse(localStorage.getItem('neurosync_academia_progress') || '{}');
+            const completedCount = Object.values(progress).filter(Boolean).length;
+            const pct = Math.round((completedCount / modules.length) * 100);
+
+            document.getElementById('mastery-bar-fill').style.width = `${pct}%`;
+            document.getElementById('mastery-pct').innerText = `${pct}%`;
+        }
+
+        renderModules();
+    </script>
+</body>
+</html>
