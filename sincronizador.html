@@ -39,12 +39,6 @@
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-leaderboard');">
                 <i class="fas fa-trophy" style="color: var(--chroma-yellow);"></i> Top Global de Resonancia
             </div>
-            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-bluetooth');">
-                <i class="fas fa-broadcast-tower" style="color: #34d399;"></i> Conectar Bluetooth & Altavoces
-            </div>
-            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-share');">
-                <i class="fas fa-share-alt" style="color: var(--chroma-red);"></i> Compartir Estado en WhatsApp
-            </div>
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-binaural');">
                 <i class="fas fa-headphones" style="color: var(--chroma-cyan);"></i> Motor Binaural Dual
             </div>
@@ -76,22 +70,10 @@
         <!-- HEADER NAVIGATION -->
         <header class="header-nav">
             <div>
-                <div id="top-device-badge" class="status-pill" style="margin-bottom: 4px; cursor: pointer;" onclick="openScreen('screen-bluetooth')">
-                    <span class="status-dot"></span> Altavoz: Este Dispositivo
-                </div>
                 <div class="brand-title">Neuro<span>Sync</span></div>
             </div>
 
             <div class="nav-actions">
-                <button class="btn-icon" title="Conectar Dispositivo Bluetooth" onclick="openScreen('screen-bluetooth')">
-                    <i class="fas fa-broadcast-tower" style="color: #34d399;"></i>
-                </button>
-                <button class="btn-icon" title="Compartir Estado en WhatsApp" onclick="openScreen('screen-share')">
-                    <i class="fas fa-share-alt" style="color: var(--chroma-cyan);"></i>
-                </button>
-                <button class="btn-icon" title="Top Global de Resonancia" onclick="openScreen('screen-leaderboard')">
-                    <i class="fas fa-trophy" style="color: var(--chroma-yellow);"></i>
-                </button>
                 <button class="btn-icon" title="Menú Principal" onclick="toggleDrawer()">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -150,7 +132,7 @@
                 <!-- Bottom Spotify Actions Row: Connect Bluetooth & Share Sheet -->
                 <div class="player-bottom-bar">
                     <button id="btn-bt-bar" class="spotify-bottom-btn" title="Conectar a Dispositivos Bluetooth o Altavoces" onclick="openScreen('screen-bluetooth')">
-                        <i class="fas fa-broadcast-tower"></i> <span id="bt-status-label" style="font-size: 0.8rem;">Dispositivos</span>
+                        <i class="fas fa-broadcast-tower"></i>
                     </button>
 
                     <div style="display: flex; gap: 8px;">
@@ -172,13 +154,10 @@
 
             <!-- Frequencies Playlist Selector Grid -->
             <div style="width: 100%; max-width: 960px; margin-top: 28px; padding: 0 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                <div style="margin-bottom: 14px;">
                     <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">
                         Seleccionar Frecuencia Base (13 Frecuencias Sagradas)
                     </span>
-                    <button class="btn-pill btn-pill-glass" style="padding: 6px 14px; font-size: 0.75rem;" onclick="openScreen('screen-reporte')">
-                        <i class="fas fa-chart-bar" style="color: var(--chroma-cyan);"></i> Ver Mi Reporte
-                    </button>
                 </div>
                 <div id="playlist-grid" class="freq-playlist-grid"></div>
             </div>
@@ -493,9 +472,7 @@
                         acceptAllDevices: true,
                         optionalServices: ['battery_service', 'audio_stream']
                     });
-                    document.getElementById('bt-status-label').innerText = device.name || 'Bluetooth Conectado';
-                    document.getElementById('top-device-badge').innerHTML = `<span class="status-dot"></span> Altavoz: ${device.name}`;
-                    alert(`¡Dispositivo "${device.name}" sincronizado correctamente!`);
+                    alert(`¡Dispositivo "${device.name || 'Bluetooth'}" sincronizado correctamente!`);
                 } catch (e) {
                     // Si el usuario cancela o el navegador no tiene bluetooth activo
                     alert('Puedes seleccionar tu altavoz o audífonos Bluetooth en el control de sonido de tu teléfono/PC.');
