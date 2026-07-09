@@ -3,7 +3,6 @@ const CORE_ASSETS = [
     './',
     './index.html',
     './sincronizador.html',
-    './academia.html',
     './css/style.css',
     './js/chromatic-bg.js',
     './js/auth.js',
