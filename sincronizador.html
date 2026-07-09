@@ -669,10 +669,31 @@
                     return;
                 }
 
-                const countryFlags = ["🇲🇽 MX", "🇪🇸 ES", "🇨🇴 CO", "🇦🇷 AR", "🇺🇸 US", "🇨🇱 CL", "🇵🇪 PE"];
+                const flagMap = {
+                    'AR': '🇦🇷 AR', 'VE': '🇻🇪 VE', 'CO': '🇨🇴 CO', 'MX': '🇲🇽 MX',
+                    'ES': '🇪🇸 ES', 'US': '🇺🇸 US', 'CL': '🇨🇱 CL', 'PE': '🇵🇪 PE',
+                    'EC': '🇪🇨 EC', 'BO': '🇧🇴 BO', 'UY': '🇺🇾 UY', 'PY': '🇵🇾 PY'
+                };
 
                 container.innerHTML = data.map((u, index) => {
-                    const flag = u.country || countryFlags[index % countryFlags.length];
+                    let rawName = (u.name || 'Sincronizador').trim();
+                    let flag = '';
+
+                    // Detectar si el nombre termina en un código de país de 2 letras (ej: "juangabrielferreyra79 AR" o "yangcarotzen co")
+                    const match = rawName.match(/\s+([A-Za-z]{2})$/);
+                    if (match) {
+                        const code = match[1].toUpperCase();
+                        if (flagMap[code]) {
+                            flag = flagMap[code];
+                            rawName = rawName.replace(/\s+[A-Za-z]{2}$/, '').trim();
+                        } else {
+                            flag = code.toUpperCase();
+                            rawName = rawName.replace(/\s+[A-Za-z]{2}$/, '').trim();
+                        }
+                    } else if (u.country) {
+                        flag = u.country;
+                    }
+
                     const isTop1 = index === 0;
                     return `
                         <div style="background: ${isTop1 ? 'rgba(255, 219, 31, 0.08)' : 'var(--glass-bg)'}; border: 1px solid ${isTop1 ? 'rgba(255, 219, 31, 0.4)' : 'var(--glass-border)'}; border-radius: 18px; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -682,10 +703,10 @@
                                 </div>
                                 <div>
                                     <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">
-                                        ${u.name || 'Sincronizador'} <span style="font-size: 0.8rem; margin-left: 8px; color: var(--text-muted);">${flag}</span>
+                                        ${rawName} ${flag ? `<span style="font-size: 0.8rem; margin-left: 8px; color: var(--text-muted);">${flag}</span>` : ''}
                                     </div>
                                     <div style="font-size: 0.78rem; color: var(--text-muted);">
-                                        Racha activa: ${u.streak || 3} días continuos
+                                        Racha activa: ${u.streak || 1} días continuos
                                     </div>
                                 </div>
                             </div>
