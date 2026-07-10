@@ -9,195 +9,483 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-
     <style>
-        .login-page-wrapper {
-            min-height: 100vh;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            background: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .banking-app-wrapper {
+            height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* ÁREA SUPERIOR CON FONDO CROMÁTICO */
+        .banking-top-area {
+            flex: 1;
+            min-height: 55vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 24px 28px;
+        }
+
+        #chromatic-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .top-nav-bar {
             position: relative;
             z-index: 10;
-        }
-
-        .login-hero-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .login-hero-header h1 {
-            font-family: var(--font-heading);
-            font-size: clamp(2.2rem, 6vw, 3rem);
-            font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 8px;
-            line-height: 1.1;
-        }
-
-        .login-hero-header p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            max-width: 420px;
-            margin: 0 auto;
-        }
-
-        .login-card-container {
-            width: 100%;
-            max-width: 440px;
-        }
-
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 18px;
-        }
-
-        .input-icon-left {
-            position: absolute;
-            left: 16px;
-            top: 42px;
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-
-        .input-icon-right {
-            position: absolute;
-            right: 16px;
-            top: 42px;
-            color: var(--text-muted);
-            font-size: 1rem;
-            cursor: pointer;
-        }
-
-        .form-input-with-icon {
-            padding-left: 44px !important;
-            padding-right: 44px !important;
-        }
-
-        .divider-box {
             display: flex;
             align-items: center;
-            margin: 28px 0 20px;
-            color: var(--text-dim);
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            justify-content: space-between;
+            width: 100%;
         }
 
-        .divider-box::before,
-        .divider-box::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--glass-border);
+        .banking-nav-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .divider-box span {
-            padding: 0 14px;
+        .banking-nav-circle:hover {
+            background: rgba(0, 0, 0, 0.4);
         }
 
-        .actions-stack {
+        .banking-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-square {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #00d4ff, #3a7bd5);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+        }
+
+        /* SALUDO CENTRAL */
+        .banking-greeting-center {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            margin: auto 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .banking-greeting-text {
+            font-size: clamp(2rem, 6vw, 2.6rem);
+            color: #ffffff;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .banking-greeting-text strong {
+            font-weight: 800;
+        }
+
+        .edit-name-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            font-size: 0.9rem;
+            opacity: 0.75;
+            transition: opacity 0.2s;
+        }
+
+        .banking-greeting-center:hover .edit-name-badge {
+            opacity: 1;
+        }
+
+        /* PÍLDORA WHATSAPP */
+        .whatsapp-banner-pill {
+            position: relative;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin: 0 auto;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s;
+        }
+
+        .whatsapp-banner-pill:hover {
+            transform: translateY(-2px);
+        }
+
+        /* RECUADRO BLANCO INFERIOR (BOTTOM SHEET) */
+        .banking-bottom-sheet {
+            background: #ffffff;
+            border-radius: 36px 36px 0 0;
+            padding: 36px 28px 24px;
+            min-height: 42vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 20;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .sheet-content-wrapper {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* BOTÓN PRINCIPAL BIOMÉTRICO */
+        .btn-banking-primary {
+            background: #003db8;
+            color: #ffffff;
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 28px rgba(0, 61, 184, 0.28);
+            transition: all 0.25s ease;
+        }
+
+        .btn-banking-primary:hover {
+            background: #003399;
+            transform: translateY(-1px);
+            box-shadow: 0 14px 32px rgba(0, 61, 184, 0.35);
+        }
+
+        .btn-banking-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* ENLACE CON CONTRASEÑA */
+        .btn-banking-link {
+            background: none;
+            border: none;
+            color: #1e293b;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-top: 26px;
+            cursor: pointer;
+            padding: 8px 16px;
+            transition: color 0.2s;
+        }
+
+        .btn-banking-link:hover {
+            color: #003db8;
+        }
+
+        /* FORMULARIO DE CONTRASEÑA */
+        .banking-input-wrapper {
+            width: 100%;
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .banking-input-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .banking-input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 1rem;
+            color: #0f172a;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .banking-input:focus {
+            border-color: #003db8;
+            background: #ffffff;
         }
 
         .msg-banner {
-            margin-top: 18px;
-            padding: 14px 16px;
-            border-radius: 14px;
-            font-size: 0.9rem;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 0.88rem;
             font-weight: 500;
             display: none;
             text-align: center;
+            margin-top: 14px;
         }
 
         .msg-banner.success {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            color: #047857;
         }
 
         .msg-banner.error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #f87171;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #b91c1c;
+        }
+
+        /* VERSIÓN FOOTER */
+        .banking-version-footer {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-top: 24px;
         }
     </style>
 </head>
 <body>
 
-    <!-- CHROMATIC FLOWING DISTORTION BACKGROUND -->
-    <canvas id="chromatic-canvas"></canvas>
-    <div class="film-grain"></div>
+    <div class="banking-app-wrapper">
+        <!-- ÁREA SUPERIOR: FONDO CROMÁTICO + NAVEGACIÓN + SALUDO -->
+        <div class="banking-top-area">
+            <canvas id="chromatic-canvas"></canvas>
 
-    <div class="login-page-wrapper">
-        <div class="login-hero-header">
-            <div class="status-pill" style="margin-bottom: 16px;">
-                <span class="status-dot"></span>
-                Acceso Sincronizado Seguro
+            <div class="top-nav-bar">
+                <button class="banking-nav-circle" title="Menú">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="banking-logo">
+                    <span class="logo-square"></span>
+                    NeuroSync
+                </div>
+
+                <button class="banking-nav-circle" title="Seguridad">
+                    <i class="fas fa-lock"></i>
+                </button>
             </div>
-            <h1>Neuro<span>Sync</span></h1>
-            <p>Sincronización Cerebral & Bienestar Frecuencial</p>
+
+            <!-- SALUDO PERSONALIZABLE POR USUARIO -->
+            <div class="banking-greeting-center" onclick="changeUserDisplayName()" title="Haz clic para cambiar tu nombre">
+                <h1 class="banking-greeting-text">
+                    Hola, <strong id="user-display-name">Guilmar</strong>
+                    <span class="edit-name-badge"><i class="fas fa-pen" style="font-size: 0.95rem;"></i></span>
+                </h1>
+            </div>
+
+            <!-- PÍLDORA WHATSAPP -->
+            <a href="https://wa.link/3yc8pr" target="_blank" rel="noopener" class="whatsapp-banner-pill">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fab fa-whatsapp" style="color: #22c55e; font-size: 1.35rem;"></i>
+                    <span>¡Soporte por WhatsApp sin salir de tu APP!</span>
+                </div>
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
 
-        <div class="login-card-container">
-            <div class="glass-card">
-                <form id="login-form">
-                    <div class="input-wrapper">
-                        <label class="input-label">Correo Electrónico</label>
-                        <i class="fas fa-envelope input-icon-left"></i>
-                        <input type="email" id="user-email" class="form-input form-input-with-icon" placeholder="correo@ejemplo.com" required autocomplete="email">
-                    </div>
-
-                    <div class="input-wrapper">
-                        <label class="input-label">Clave de Acceso</label>
-                        <i class="fas fa-lock input-icon-left"></i>
-                        <input type="password" id="user-pass" class="form-input form-input-with-icon" placeholder="••••••••" required autocomplete="current-password">
-                        <i class="fas fa-eye input-icon-right" id="toggle-pass-visibility" title="Mostrar/Ocultar contraseña"></i>
-                    </div>
-
-                    <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 10px; padding: 15px;" id="submit-login-btn">
-                        <i class="fas fa-bolt"></i> Validar & Ingresar al Panel
+        <!-- RECUADRO BLANCO INFERIOR -->
+        <div class="banking-bottom-sheet">
+            <div class="sheet-content-wrapper">
+                <!-- VISTA 1: INGRESO BIOMÉTRICO -->
+                <div id="biometric-sheet-view" style="width: 100%; text-align: center;">
+                    <button type="button" class="btn-banking-primary" id="main-bio-btn" onclick="triggerBiometricAction()">
+                        <i id="bio-btn-icon" class="fas fa-expand" style="font-size: 1.25rem;"></i>
+                        <span id="bio-btn-text">Ingresar con Face ID</span>
                     </button>
-                </form>
+
+                    <button type="button" class="btn-banking-link" onclick="showPasswordSheetView()">
+                        Ingresa con contraseña
+                    </button>
+                </div>
+
+                <!-- VISTA 2: INGRESO CON CONTRASEÑA -->
+                <div id="password-sheet-view" style="display: none; width: 100%;">
+                    <button type="button" class="btn-banking-link" style="margin-top: 0; margin-bottom: 18px; font-size: 0.9rem; color: #64748b;" onclick="showBiometricSheetView()">
+                        <i class="fas fa-arrow-left"></i> Volver a ingreso biométrico
+                    </button>
+
+                    <form id="login-form">
+                        <div class="banking-input-wrapper">
+                            <label class="banking-input-label">Correo Electrónico</label>
+                            <input type="email" id="user-email" class="banking-input" placeholder="correo@ejemplo.com" required autocomplete="email">
+                        </div>
+
+                        <div class="banking-input-wrapper">
+                            <label class="banking-input-label">Contraseña</label>
+                            <input type="password" id="user-pass" class="banking-input" placeholder="••••••••" required autocomplete="current-password">
+                        </div>
+
+                        <button type="submit" class="btn-banking-primary" style="margin-top: 10px;" id="submit-login-btn">
+                            Validar & Ingresar
+                        </button>
+                    </form>
+                </div>
 
                 <div id="status-message" class="msg-banner"></div>
-
-                <div class="divider-box">
-                    <span>¿Aún no tienes licencia?</span>
-                </div>
-
-                <div class="actions-stack">
-                    <a href="https://pay.hotmart.com/U104728533E" target="_blank" rel="noopener" class="btn-pill btn-pill-primary" style="width: 100%;">
-                        <i class="fas fa-ticket-alt"></i> Adquirir Frecuencias NeuroSync
-                    </a>
-
-                    <a href="https://wa.link/3yc8pr" target="_blank" rel="noopener" class="btn-pill btn-pill-glass" style="width: 100%;">
-                        <i class="fab fa-whatsapp" style="font-size: 1.15rem; color: #22c55e;"></i> Soporte Técnico por WhatsApp
-                    </a>
-                </div>
             </div>
+
+            <!-- FOOTER CON VERSIÓN V4.0 -->
+            <div class="banking-version-footer">v4.0</div>
         </div>
+    </div>
+
     <script src="js/chromatic-bg.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Init Chromatic Flowing Engine
+        // 1. Inicializar motor cromático en el recuadro superior
         const chromaEngine = new ChromaticFlowEngine('chromatic-canvas');
 
-        // Toggle password visibility
-        const toggleBtn = document.getElementById('toggle-pass-visibility');
-        const passInput = document.getElementById('user-pass');
-        toggleBtn.addEventListener('click', () => {
-            const isPass = passInput.getAttribute('type') === 'password';
-            passInput.setAttribute('type', isPass ? 'text' : 'password');
-            toggleBtn.className = isPass ? 'fas fa-eye-slash input-icon-right' : 'fas fa-eye input-icon-right';
-        });
+        // 2. Personalizar Nombre de Usuario
+        function loadUserDisplayName() {
+            const savedName = localStorage.getItem('neurosync_user_name') || 'Guilmar';
+            const nameEl = document.getElementById('user-display-name');
+            if (nameEl) nameEl.textContent = savedName;
+        }
+        loadUserDisplayName();
 
-        // Handle Login Submission with explicit validation
-        const loginForm = document.getElementById('login-form');
+        function changeUserDisplayName() {
+            const current = localStorage.getItem('neurosync_user_name') || 'Guilmar';
+            const newName = prompt('Personaliza tu nombre de usuario en NeuroSync:', current);
+            if (newName && newName.trim() !== '') {
+                localStorage.setItem('neurosync_user_name', newName.trim());
+                loadUserDisplayName();
+            }
+        }
+
+        // 3. Configurar texto e icono biométrico de acuerdo a iOS vs Android
+        function setupBiometricDeviceUI() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            const bioIcon = document.getElementById('bio-btn-icon');
+            const bioText = document.getElementById('bio-btn-text');
+
+            if (isIOS) {
+                if (bioIcon) bioIcon.className = 'fas fa-expand';
+                if (bioText) bioText.textContent = 'Ingresar con Face ID';
+            } else {
+                if (bioIcon) bioIcon.className = 'fas fa-fingerprint';
+                if (bioText) bioText.textContent = 'Ingresar con Huella Dactilar';
+            }
+        }
+        setupBiometricDeviceUI();
+
+        // 4. Alternar entre Vistas Biometría <-> Contraseña
+        function showPasswordSheetView() {
+            document.getElementById('biometric-sheet-view').style.display = 'none';
+            document.getElementById('password-sheet-view').style.display = 'block';
+            document.getElementById('status-message').style.display = 'none';
+            const emailInput = document.getElementById('user-email');
+            if (emailInput) emailInput.focus();
+        }
+
+        function showBiometricSheetView() {
+            document.getElementById('password-sheet-view').style.display = 'none';
+            document.getElementById('biometric-sheet-view').style.display = 'block';
+            document.getElementById('status-message').style.display = 'none';
+        }
+
+        // 5. Acción Biométrica
         const msgBanner = document.getElementById('status-message');
+        const mainBioBtn = document.getElementById('main-bio-btn');
+
+        async function triggerBiometricAction() {
+            msgBanner.style.display = 'none';
+            const isEnabled = localStorage.getItem('neurosync_biometric_enabled') === 'true';
+
+            if (isEnabled) {
+                try {
+                    if (mainBioBtn) mainBioBtn.disabled = true;
+                    const res = await window.neuroAuth.loginWithBiometrics();
+                    msgBanner.className = 'msg-banner success';
+                    msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> Identidad biométrica verificada`;
+                    msgBanner.style.display = 'block';
+
+                    setTimeout(() => {
+                        window.location.href = 'sincronizador.html';
+                    }, 650);
+                } catch (err) {
+                    msgBanner.className = 'msg-banner error';
+                    msgBanner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${err.message}`;
+                    msgBanner.style.display = 'block';
+                } finally {
+                    if (mainBioBtn) mainBioBtn.disabled = false;
+                }
+            } else {
+                const emailVal = document.getElementById('user-email') ? document.getElementById('user-email').value.trim() : 'usuario@neurosync.com';
+                try {
+                    if (mainBioBtn) mainBioBtn.disabled = true;
+                    await window.neuroAuth.registerBiometrics(emailVal || 'usuario@neurosync.com');
+                    msgBanner.className = 'msg-banner success';
+                    msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> ¡Biometría vinculada correctamente!`;
+                    msgBanner.style.display = 'block';
+                } catch (err) {
+                    msgBanner.className = 'msg-banner error';
+                    msgBanner.innerHTML = `<i class="fas fa-info-circle"></i> ${err.message}`;
+                    msgBanner.style.display = 'block';
+                } finally {
+                    if (mainBioBtn) mainBioBtn.disabled = false;
+                }
+            }
+        }
+
+        // 6. Envío de formulario con contraseña
+        const loginForm = document.getElementById('login-form');
         const submitBtn = document.getElementById('submit-login-btn');
 
         loginForm.addEventListener('submit', async (e) => {
@@ -217,7 +505,7 @@
 
                 setTimeout(() => {
                     window.location.href = 'sincronizador.html';
-                }, 800);
+                }, 750);
             } catch (err) {
                 msgBanner.className = 'msg-banner error';
                 msgBanner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${err.message}`;

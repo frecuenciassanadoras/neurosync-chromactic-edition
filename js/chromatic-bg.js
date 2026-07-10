@@ -10,8 +10,9 @@ class ChromaticFlowEngine {
         this.canvas = document.getElementById(canvasId);
         if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        const parent = this.canvas.parentElement;
+        this.width = parent ? parent.clientWidth : window.innerWidth;
+        this.height = parent ? parent.clientHeight : window.innerHeight;
         this.time = 0;
         this.speed = 0.008;
         this.mouse = { x: this.width / 2, y: this.height / 2, targetX: this.width / 2, targetY: this.height / 2 };
@@ -40,8 +41,9 @@ class ChromaticFlowEngine {
     }
 
     resize() {
-        this.width = window.innerWidth;
-        this.height = window.innerHeight;
+        const parent = this.canvas.parentElement;
+        this.width = parent ? parent.clientWidth : window.innerWidth;
+        this.height = parent ? parent.clientHeight : window.innerHeight;
         this.canvas.width = this.width;
         this.canvas.height = this.height;
     }
