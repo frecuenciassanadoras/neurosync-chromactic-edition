@@ -144,47 +144,24 @@
 
         <div class="login-card-container">
             <div class="glass-card">
-                <!-- VISTA 1: SELECTOR DE OPCIONES DE INGRESO -->
-                <div id="login-options-view">
-                    <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 22px; font-weight: 600;">
-                        Selecciona tu método de ingreso
-                    </p>
+                <form id="login-form">
+                    <div class="input-wrapper">
+                        <label class="input-label">Correo Electrónico</label>
+                        <i class="fas fa-envelope input-icon-left"></i>
+                        <input type="email" id="user-email" class="form-input form-input-with-icon" placeholder="correo@ejemplo.com" required autocomplete="email">
+                    </div>
 
-                    <button type="button" id="main-bio-btn" class="btn-pill btn-pill-chroma" style="width: 100%; padding: 18px; font-size: 1.05rem; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 28px rgba(0,212,255,0.35);" onclick="triggerBiometricAction()">
-                        <i class="fas fa-fingerprint" style="font-size: 1.4rem;"></i>
-                        <span id="main-bio-label">Ingresar con Huella / Face ID</span>
+                    <div class="input-wrapper">
+                        <label class="input-label">Clave de Acceso</label>
+                        <i class="fas fa-lock input-icon-left"></i>
+                        <input type="password" id="user-pass" class="form-input form-input-with-icon" placeholder="••••••••" required autocomplete="current-password">
+                        <i class="fas fa-eye input-icon-right" id="toggle-pass-visibility" title="Mostrar/Ocultar contraseña"></i>
+                    </div>
+
+                    <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 10px; padding: 15px;" id="submit-login-btn">
+                        <i class="fas fa-bolt"></i> Validar & Ingresar al Panel
                     </button>
-
-                    <button type="button" id="go-to-email-btn" class="btn-pill btn-pill-glass" style="width: 100%; padding: 16px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="showEmailLoginForm()">
-                        <i class="fas fa-envelope" style="color: #00d4ff;"></i> Iniciar con Correo Electrónico
-                    </button>
-                </div>
-
-                <!-- VISTA 2: FORMULARIO DE CORREO Y CONTRASEÑA (Oculto por defecto) -->
-                <div id="email-login-view" style="display: none;">
-                    <button type="button" class="btn-pill btn-pill-glass" style="padding: 8px 14px; font-size: 0.85rem; margin-bottom: 18px;" onclick="showLoginOptionsView()">
-                        <i class="fas fa-arrow-left"></i> Volver a opciones
-                    </button>
-
-                    <form id="login-form">
-                        <div class="input-wrapper">
-                            <label class="input-label">Correo Electrónico</label>
-                            <i class="fas fa-envelope input-icon-left"></i>
-                            <input type="email" id="user-email" class="form-input form-input-with-icon" placeholder="correo@ejemplo.com" required autocomplete="email">
-                        </div>
-
-                        <div class="input-wrapper">
-                            <label class="input-label">Clave de Acceso</label>
-                            <i class="fas fa-lock input-icon-left"></i>
-                            <input type="password" id="user-pass" class="form-input form-input-with-icon" placeholder="••••••••" required autocomplete="current-password">
-                            <i class="fas fa-eye input-icon-right" id="toggle-pass-visibility" title="Mostrar/Ocultar contraseña"></i>
-                        </div>
-
-                        <button type="submit" class="btn-pill btn-pill-chroma" style="width: 100%; margin-top: 10px; padding: 15px;" id="submit-login-btn">
-                            <i class="fas fa-bolt"></i> Validar & Ingresar al Panel
-                        </button>
-                    </form>
-                </div>
+                </form>
 
                 <div id="status-message" class="msg-banner"></div>
 
@@ -233,80 +210,6 @@
             passInput.setAttribute('type', isPass ? 'text' : 'password');
             toggleBtn.className = isPass ? 'fas fa-eye-slash input-icon-right' : 'fas fa-eye input-icon-right';
         });
-
-        // Setup Login View Switching
-        function showEmailLoginForm() {
-            document.getElementById('login-options-view').style.display = 'none';
-            document.getElementById('email-login-view').style.display = 'block';
-            document.getElementById('status-message').style.display = 'none';
-            const emailInput = document.getElementById('user-email');
-            if (emailInput) emailInput.focus();
-        }
-
-        function showLoginOptionsView() {
-            document.getElementById('email-login-view').style.display = 'none';
-            document.getElementById('login-options-view').style.display = 'block';
-            document.getElementById('status-message').style.display = 'none';
-        }
-
-        // Setup Biometric UI
-        const mainBioBtn = document.getElementById('main-bio-btn');
-        const mainBioLabel = document.getElementById('main-bio-label');
-        const msgBanner = document.getElementById('status-message');
-
-        function updateBiometricUI() {
-            if (window.neuroAuth && window.neuroAuth.isBiometricSupported()) {
-                if (mainBioBtn) mainBioBtn.style.display = 'flex';
-                const isEnabled = localStorage.getItem('neurosync_biometric_enabled') === 'true';
-                if (mainBioLabel) {
-                    mainBioLabel.textContent = isEnabled ? "Ingresar con Huella / Face ID" : "Vincular Huella / Face ID";
-                }
-            } else {
-                if (mainBioBtn) mainBioBtn.style.display = 'none';
-            }
-        }
-        updateBiometricUI();
-
-        async function triggerBiometricAction() {
-            msgBanner.style.display = 'none';
-            const isEnabled = localStorage.getItem('neurosync_biometric_enabled') === 'true';
-
-            if (isEnabled) {
-                try {
-                    mainBioBtn.disabled = true;
-                    const res = await window.neuroAuth.loginWithBiometrics();
-                    msgBanner.className = 'msg-banner success';
-                    msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> Identidad biométrica verificada. Bienvenido ${res.email}`;
-                    msgBanner.style.display = 'block';
-
-                    setTimeout(() => {
-                        window.location.href = 'sincronizador.html';
-                    }, 700);
-                } catch (err) {
-                    msgBanner.className = 'msg-banner error';
-                    msgBanner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${err.message}`;
-                    msgBanner.style.display = 'block';
-                } finally {
-                    mainBioBtn.disabled = false;
-                }
-            } else {
-                const emailVal = document.getElementById('user-email').value.trim() || 'usuario@neurosync.com';
-                try {
-                    mainBioBtn.disabled = true;
-                    await window.neuroAuth.registerBiometrics(emailVal);
-                    msgBanner.className = 'msg-banner success';
-                    msgBanner.innerHTML = `<i class="fas fa-fingerprint"></i> ¡Huella / Face ID vinculado correctamente en este dispositivo!`;
-                    msgBanner.style.display = 'block';
-                    updateBiometricUI();
-                } catch (err) {
-                    msgBanner.className = 'msg-banner error';
-                    msgBanner.innerHTML = `<i class="fas fa-info-circle"></i> ${err.message}`;
-                    msgBanner.style.display = 'block';
-                } finally {
-                    mainBioBtn.disabled = false;
-                }
-            }
-        }
 
         // Handle Login Submission with explicit validation
         const loginForm = document.getElementById('login-form');
