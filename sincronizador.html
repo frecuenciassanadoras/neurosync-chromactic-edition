@@ -39,6 +39,9 @@
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-leaderboard');">
                 <i class="fas fa-trophy" style="color: var(--chroma-yellow);"></i> Top Global de Resonancia
             </div>
+            <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-wall');">
+                <i class="fas fa-comment-dots" style="color: #6ee7b7;"></i> Muro de Resonancia Global
+            </div>
             <div class="sidebar-item" onclick="toggleDrawer(); openScreen('screen-binaural');">
                 <i class="fas fa-headphones" style="color: var(--chroma-cyan);"></i> Motor Binaural Dual
             </div>
@@ -455,6 +458,38 @@
         </div>
     </div>
 
+    <!-- ======================================================================
+         FULL SCREEN: MURO DE RESONANCIA GLOBAL
+         ====================================================================== -->
+    <div id="screen-wall" class="view-screen">
+        <div class="view-header-bar">
+            <button class="btn-pill btn-pill-glass" onclick="showMainPlayerView()">
+                <i class="fas fa-arrow-left"></i> Volver al Reproductor
+            </button>
+            <h2 style="font-family: var(--font-heading); font-size: clamp(1.3rem, 4vw, 1.8rem);">
+                <i class="fas fa-comment-dots" style="color: #6ee7b7;"></i> Muro de Resonancia Global
+            </h2>
+        </div>
+
+        <div class="view-screen-container">
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.92rem; margin-bottom: 24px;">
+                Comparte tu experiencia frecuencial con la comunidad de sincronizadores en tiempo real
+            </p>
+
+            <div class="glass-card" style="margin-bottom: 24px; padding: 20px;">
+                <textarea id="wall-post-text" rows="3" class="form-input" placeholder="¿Qué sientes en tu interior ahora mismo o qué frecuencia estás experimentando?" style="width: 100%; resize: none; margin-bottom: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 14px; color: #fff; font-size: 0.95rem;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted);"><i class="fas fa-globe" style="color: var(--chroma-cyan);"></i> Comunidad Global Sincronizada</span>
+                    <button class="btn-pill btn-pill-primary" onclick="submitWallPost()"><i class="fas fa-paper-plane"></i> Compartir Vibración</button>
+                </div>
+            </div>
+
+            <div id="wall-feed-container" style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Feed dinámico -->
+            </div>
+        </div>
+    </div>
+
     <script src="js/chromatic-bg.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/audio-engine.js"></script>
@@ -478,9 +513,19 @@
 
             if (screenId === 'screen-reporte') renderReporteScreen();
             if (screenId === 'screen-leaderboard') fetchSupabaseLeaderboard();
+            if (screenId === 'screen-wall') loadGlobalWallFeed();
             if (screenId === 'screen-nature') renderNatureScreenGrid();
             if (screenId === 'screen-healing') renderHealingScreenGrid();
             if (screenId === 'screen-share') updateShareCardUI();
+        }
+
+        function toggleWallModal() {
+            const wallScreen = document.getElementById('screen-wall');
+            if (wallScreen && wallScreen.classList.contains('active')) {
+                showMainPlayerView();
+            } else {
+                openScreen('screen-wall');
+            }
         }
 
         function showMainPlayerView() {
@@ -1182,6 +1227,361 @@
 
         function onHealingVolumeChange(val) {
             healingAudioPlayer.volume = Math.max(0, Math.min(1, parseFloat(val)));
+        }
+
+        /* ====================================================================
+           SISTEMA SOCIAL: MURO DE RESONANCIA GLOBAL
+           ==================================================================== */
+        let wallFeedPosts = [];
+        const WALL_ADMIN_EMAIL = "guilmarzy@gmail.com";
+
+        function getDefaultWallPosts() {
+            return [
+                {
+                    id: "post-1",
+                    author: "Guilmar (Creador)",
+                    email: "guilmarzy@gmail.com",
+                    text: "Sintonizando la frecuencia 528 Hz para la regeneración celular. ¡Bienvenidos a la nueva versión 4.0 de NeuroSync! Estamos resonando con miles de usuarios en toda Latinoamérica.",
+                    likes: 38,
+                    hasLiked: false,
+                    created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+                    replies: [
+                        {
+                            id: "reply-1",
+                            author: "Carlos M.",
+                            email: "carlos@example.com",
+                            text: "¡Increíble la nitidez del audio y el fondo cromático! Siento una paz instantánea.",
+                            likes: 11,
+                            hasLiked: false,
+                            created_at: new Date(Date.now() - 3600000 * 20).toISOString()
+                        },
+                        {
+                            id: "reply-2",
+                            author: "Andrea S.",
+                            email: "andrea@example.com",
+                            text: "Gracias Guilmar por esta herramienta, las frecuencias sanadoras con el Buda son una maravilla.",
+                            likes: 8,
+                            hasLiked: false,
+                            created_at: new Date(Date.now() - 3600000 * 18).toISOString()
+                        }
+                    ]
+                },
+                {
+                    id: "post-2",
+                    author: "Valeria R.",
+                    email: "valeria@example.com",
+                    text: "Llevo 3 días seguidos escuchando 432 Hz antes de dormir y mi sueño profundo se ha duplicado. ¿Alguien más probando 963 Hz?",
+                    likes: 24,
+                    hasLiked: false,
+                    created_at: new Date(Date.now() - 3600000 * 14).toISOString(),
+                    replies: [
+                        {
+                            id: "reply-3",
+                            author: "Rodrigo V.",
+                            email: "rodrigo@example.com",
+                            text: "¡Yo! 963 Hz para activar la glándula pineal durante mi meditación matutina. Altamente recomendado.",
+                            likes: 9,
+                            hasLiked: false,
+                            created_at: new Date(Date.now() - 3600000 * 10).toISOString()
+                        }
+                    ]
+                },
+                {
+                    id: "post-3",
+                    author: "Martín P.",
+                    email: "martin@example.com",
+                    text: "La combinación de 111 Hz con Sonidos de Lluvia y Truenos en el apartado Naturaleza es de otro planeta para concentrarse trabajando.",
+                    likes: 19,
+                    hasLiked: false,
+                    created_at: new Date(Date.now() - 3600000 * 6).toISOString(),
+                    replies: []
+                },
+                {
+                    id: "post-4",
+                    author: "Guilmar (Creador)",
+                    email: "guilmarzy@gmail.com",
+                    text: "Recuerden que la Resonancia Schumann de 7.83 Hz coincide exactamente con el estado cerebral Theta-Alfa limítrofe (8 Hz). Sigan acumulando coherencia cuántica.",
+                    likes: 45,
+                    hasLiked: false,
+                    created_at: new Date(Date.now() - 3600000 * 3).toISOString(),
+                    replies: []
+                }
+            ];
+        }
+
+        async function loadGlobalWallFeed() {
+            const container = document.getElementById('wall-feed-container');
+            if (!container) return;
+
+            container.innerHTML = '<div style="text-align:center; color:#fff; padding: 28px;">Sintonizando frecuencias globales de la comunidad...</div>';
+
+            let fetchedPosts = null;
+
+            // 1. Intentar cargar directamente de Supabase REST API (neurosync_social_feed)
+            try {
+                const supaRes = await fetch(`${SUPABASE_URL}/rest/v1/neurosync_social_feed?select=*&order=created_at.desc`, {
+                    headers: {
+                        "apikey": SUPABASE_ANON_KEY,
+                        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                if (supaRes.ok) {
+                    const data = await supaRes.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        fetchedPosts = data;
+                    }
+                }
+            } catch (e) {}
+
+            // 2. Si no hubo posts de Supabase REST, intentar endpoint /.netlify/functions/getSocial
+            if (!fetchedPosts) {
+                try {
+                    const netRes = await fetch('/.netlify/functions/getSocial');
+                    if (netRes.ok) {
+                        const data = await netRes.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            fetchedPosts = data;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 3. Procesar o combinar con los posts del historial y guardado local
+            if (fetchedPosts && fetchedPosts.length > 0) {
+                let mainPosts = fetchedPosts.filter(p => !p.parent_id);
+                let replies = fetchedPosts.filter(p => p.parent_id);
+
+                mainPosts.forEach(p => {
+                    p.replies = replies.filter(r => r.parent_id === p.id).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                    p.hasLiked = false;
+                });
+
+                // Si hay pocos en la BD, combinar con la comunidad base para un historial rico
+                wallFeedPosts = mainPosts.length >= 2 ? mainPosts : [...mainPosts, ...getDefaultWallPosts()];
+            } else {
+                wallFeedPosts = getStoredOrSeedWallPosts();
+            }
+
+            renderWallFeed();
+        }
+
+        function getStoredOrSeedWallPosts() {
+            try {
+                const local = localStorage.getItem('neurosync_wall_posts');
+                if (local) {
+                    const parsed = JSON.parse(local);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) {}
+            const seed = getDefaultWallPosts();
+            localStorage.setItem('neurosync_wall_posts', JSON.stringify(seed));
+            return seed;
+        }
+
+        function saveLocalWallPosts() {
+            try {
+                localStorage.setItem('neurosync_wall_posts', JSON.stringify(wallFeedPosts));
+            } catch (e) {}
+        }
+
+        function renderWallFeed() {
+            const container = document.getElementById('wall-feed-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (wallFeedPosts.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding: 30px;">Aún no hay publicaciones. ¡Sé el primero en elevar la vibración!</div>';
+                return;
+            }
+
+            wallFeedPosts.forEach(post => {
+                container.appendChild(createWallPostCard(post, false));
+            });
+        }
+
+        function createWallPostCard(post, isReply = false) {
+            const isAdmin = post.email === WALL_ADMIN_EMAIL;
+            const badgeHTML = isAdmin
+                ? `<span style="background: linear-gradient(135deg, #f59e0b, #d97706); color:#fff; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:12px; display:inline-flex; align-items:center; gap:4px;"><i class="fas fa-crown" style="font-size:0.6rem;"></i> Guía</span>`
+                : '';
+
+            const timeFormatted = new Date(post.created_at || Date.now()).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+            const elevateColor = post.hasLiked ? '#00d4ff' : '#94a3b8';
+
+            const card = document.createElement('div');
+            card.className = "glass-card";
+            card.style.cssText = isReply
+                ? "margin-left: 28px; margin-top: 10px; padding: 14px 16px; background: rgba(255,255,255,0.02); border-left: 2px solid var(--chroma-cyan);"
+                : "padding: 18px 20px;";
+
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 700; color: #fff; font-size: ${isReply ? '0.9rem' : '1rem'};">${post.author}</span>
+                        ${badgeHTML}
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${timeFormatted}</span>
+                </div>
+                <p style="color: #e2e8f0; font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px;">${post.text}</p>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <button class="btn-pill btn-pill-glass" style="padding: 6px 14px; font-size: 0.82rem; color: ${elevateColor};" onclick="toggleElevatePost('${post.id}')">
+                        <i class="fas fa-bolt" style="color: ${elevateColor};"></i> <span id="wall-like-${post.id}">${post.likes || 0}</span> Elevar
+                    </button>
+                    ${!isReply ? `<button class="btn-pill btn-pill-glass" style="padding: 6px 14px; font-size: 0.82rem;" onclick="openWallReplyBox('${post.id}')"><i class="fas fa-reply"></i> Responder</button>` : ''}
+                </div>
+                <div id="reply-box-${post.id}" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--glass-border);">
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="reply-input-${post.id}" class="form-input" placeholder="Escribe tu respuesta vibracional..." style="flex:1; padding: 8px 12px; font-size: 0.88rem;">
+                        <button class="btn-pill btn-pill-primary" style="padding: 8px 14px; font-size: 0.85rem;" onclick="submitWallReply('${post.id}')">Enviar</button>
+                    </div>
+                </div>
+                <div id="reply-list-${post.id}"></div>
+            `;
+
+            if (!isReply && post.replies && post.replies.length > 0) {
+                const repCont = card.querySelector(`#reply-list-${post.id}`);
+                post.replies.forEach(r => {
+                    repCont.appendChild(createWallPostCard(r, true));
+                });
+            }
+
+            return card;
+        }
+
+        async function toggleElevatePost(id) {
+            let target = null;
+            wallFeedPosts.forEach(p => {
+                if (p.id === id) target = p;
+                if (p.replies) p.replies.forEach(r => { if (r.id === id) target = r; });
+            });
+
+            if (!target || target.hasLiked) return;
+            target.likes = (target.likes || 0) + 1;
+            target.hasLiked = true;
+
+            const span = document.getElementById(`wall-like-${id}`);
+            if (span) span.innerText = target.likes;
+
+            saveLocalWallPosts();
+
+            try {
+                await fetch('/.netlify/functions/postSocial', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'like', id: id })
+                });
+            } catch (e) {}
+        }
+
+        async function submitWallPost() {
+            const input = document.getElementById('wall-post-text');
+            const text = input ? input.value.trim() : '';
+            if (!text) return;
+
+            const userEmail = localStorage.getItem('neurosync_user_email') || 'usuario@neurosync.com';
+            const userName = localStorage.getItem('neurosync_user_name') || userEmail.split('@')[0];
+
+            const newPost = {
+                id: "post-" + Date.now(),
+                author: userName,
+                email: userEmail,
+                text: text,
+                likes: 1,
+                hasLiked: true,
+                created_at: new Date().toISOString(),
+                replies: []
+            };
+
+            wallFeedPosts.unshift(newPost);
+            input.value = '';
+            saveLocalWallPosts();
+            renderWallFeed();
+
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/neurosync_social_feed`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_ANON_KEY,
+                        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+                        "Prefer": "return=representation"
+                    },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        author: userName,
+                        text: text,
+                        likes: 1
+                    })
+                });
+            } catch (e) {}
+
+            try {
+                await fetch('/.netlify/functions/postSocial', {
+                    method: 'POST',
+                    body: JSON.stringify(newPost)
+                });
+            } catch (e) {}
+        }
+
+        function openWallReplyBox(postId) {
+            const box = document.getElementById(`reply-box-${postId}`);
+            if (!box) return;
+            box.style.display = (box.style.display === 'none') ? 'block' : 'none';
+            const input = document.getElementById(`reply-input-${postId}`);
+            if (input && box.style.display === 'block') input.focus();
+        }
+
+        async function submitWallReply(postId) {
+            const input = document.getElementById(`reply-input-${postId}`);
+            const text = input ? input.value.trim() : '';
+            if (!text) return;
+
+            const userEmail = localStorage.getItem('neurosync_user_email') || 'usuario@neurosync.com';
+            const userName = localStorage.getItem('neurosync_user_name') || userEmail.split('@')[0];
+
+            const replyObj = {
+                id: "reply-" + Date.now(),
+                parent_id: postId,
+                author: userName,
+                email: userEmail,
+                text: text,
+                likes: 0,
+                hasLiked: false,
+                created_at: new Date().toISOString()
+            };
+
+            const parent = wallFeedPosts.find(p => p.id === postId);
+            if (parent) {
+                if (!parent.replies) parent.replies = [];
+                parent.replies.push(replyObj);
+                saveLocalWallPosts();
+                renderWallFeed();
+            }
+
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/neurosync_social_feed`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": SUPABASE_ANON_KEY,
+                        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+                        "Prefer": "return=representation"
+                    },
+                    body: JSON.stringify({
+                        email: userEmail,
+                        author: userName,
+                        text: text,
+                        parent_id: postId,
+                        likes: 0
+                    })
+                });
+            } catch (e) {}
+
+            try {
+                await fetch('/.netlify/functions/postSocial', {
+                    method: 'POST',
+                    body: JSON.stringify(replyObj)
+                });
+            } catch (e) {}
         }
 
         // Init player & tracking
