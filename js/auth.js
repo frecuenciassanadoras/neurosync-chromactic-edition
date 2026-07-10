@@ -10,34 +10,6 @@ class NeuroSyncAuth {
         this.STORAGE_KEY = 'neurosync_user_email';
         this.TOKEN_KEY = 'neurosync_user_token';
         this.REMEMBER_KEY = 'neurosync_remember_session';
-        this.initSocialBridge();
-    }
-
-    initSocialBridge() {
-        const ua = navigator.userAgent || navigator.vendor || window.opera;
-        const isSocialWebview = /TikTok|Instagram|FBAN|FBAV|LinkedIn/i.test(ua);
-
-        if (isSocialWebview) {
-            document.addEventListener('DOMContentLoaded', () => {
-                const hotmartLinks = document.querySelectorAll('a[href*="hotmart.com"]');
-                hotmartLinks.forEach((link) => {
-                    const originalUrl = link.href;
-                    link.addEventListener('click', (e) => {
-                        if (/Android/i.test(ua)) {
-                            e.preventDefault();
-                            const cleanUrl = originalUrl.replace(/^https?:\/\//, '');
-                            window.location.href = `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-                        } else if (/iPhone|iPad|iPod/i.test(ua)) {
-                            const bridgeModal = document.getElementById('social-bridge-modal');
-                            if (bridgeModal) {
-                                e.preventDefault();
-                                bridgeModal.classList.add('active');
-                            }
-                        }
-                    });
-                });
-            });
-        }
     }
 
     validateEmail(email) {
