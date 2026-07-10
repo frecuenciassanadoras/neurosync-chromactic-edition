@@ -321,10 +321,10 @@
                 </button>
             </div>
 
-            <!-- SALUDO PERSONALIZABLE POR USUARIO -->
+            <!-- SALUDO PERSONALIZABLE POR USUARIO + CRONOLÓGICO -->
             <div class="banking-greeting-center" onclick="changeUserDisplayName()" title="Haz clic para cambiar tu nombre">
                 <h1 class="banking-greeting-text">
-                    Hola, <strong id="user-display-name">Guilmar</strong>
+                    <span id="greeting-time-prefix">Hola</span>, <strong id="user-display-name">Bienvenido</strong>
                     <span class="edit-name-badge"><i class="fas fa-pen" style="font-size: 0.95rem;"></i></span>
                 </h1>
             </div>
@@ -391,21 +391,40 @@
         // 1. Inicializar motor cromático en el recuadro superior
         const chromaEngine = new ChromaticFlowEngine('chromatic-canvas');
 
-        // 2. Personalizar Nombre de Usuario
+        // 2. Saludo Inteligente Cronológico + Nombre Personalizado
         function loadUserDisplayName() {
-            const savedName = localStorage.getItem('neurosync_user_name') || 'Guilmar';
+            // Saludo según la hora del día
+            const hour = new Date().getHours();
+            let prefix = "Hola";
+            if (hour >= 5 && hour < 12) prefix = "Buenos días";
+            else if (hour >= 12 && hour < 19) prefix = "Buenas tardes";
+            else prefix = "Buenas noches";
+
+            const prefixEl = document.getElementById('greeting-time-prefix');
+            if (prefixEl) prefixEl.textContent = prefix;
+
+            // Nombre de usuario guardado o valor por defecto "Bienvenido"
+            const savedName = localStorage.getItem('neurosync_user_name') || 'Bienvenido';
             const nameEl = document.getElementById('user-display-name');
             if (nameEl) nameEl.textContent = savedName;
         }
         loadUserDisplayName();
 
         function changeUserDisplayName() {
-            const current = localStorage.getItem('neurosync_user_name') || 'Guilmar';
-            const newName = prompt('Personaliza tu nombre de usuario en NeuroSync:', current);
+            const current = localStorage.getItem('neurosync_user_name') || 'Bienvenido';
+            const newName = prompt('Personaliza tu nombre en NeuroSync:', current === 'Bienvenido' ? '' : current);
             if (newName && newName.trim() !== '') {
                 localStorage.setItem('neurosync_user_name', newName.trim());
                 loadUserDisplayName();
             }
+        }
+
+        function saveNameFromEmail(email) {
+            if (!email) return;
+            const prefix = email.split('@')[0];
+            const cleanName = prefix.charAt(0).toUpperCase() + prefix.slice(1).replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, ' ');
+            localStorage.setItem('neurosync_user_name', cleanName.trim());
+            loadUserDisplayName();
         }
 
         // 3. Configurar texto e icono biométrico de acuerdo a iOS vs Android
@@ -452,6 +471,7 @@
                 try {
                     if (mainBioBtn) mainBioBtn.disabled = true;
                     const res = await window.neuroAuth.loginWithBiometrics();
+                    saveNameFromEmail(res?.user?.email || localStorage.getItem('neurosync_user_email'));
                     msgBanner.className = 'msg-banner success';
                     msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> Identidad biométrica verificada`;
                     msgBanner.style.display = 'block';
@@ -471,6 +491,7 @@
                 try {
                     if (mainBioBtn) mainBioBtn.disabled = true;
                     await window.neuroAuth.registerBiometrics(emailVal || 'usuario@neurosync.com');
+                    saveNameFromEmail(emailVal);
                     msgBanner.className = 'msg-banner success';
                     msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> ¡Biometría vinculada correctamente!`;
                     msgBanner.style.display = 'block';
@@ -499,6 +520,7 @@
 
             try {
                 const res = await window.neuroAuth.login(email, pass);
+                saveNameFromEmail(email);
                 msgBanner.className = 'msg-banner success';
                 msgBanner.innerHTML = `<i class="fas fa-check-circle"></i> ${res.message}`;
                 msgBanner.style.display = 'block';
